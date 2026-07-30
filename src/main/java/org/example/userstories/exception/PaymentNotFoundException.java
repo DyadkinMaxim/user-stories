@@ -1,4 +1,4 @@
-package org.example.userstories.model;
+package org.example.userstories.exception;
 
 public class PaymentNotFoundException extends RuntimeException {
 

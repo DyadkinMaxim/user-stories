@@ -1,6 +1,5 @@
 package org.example.userstories.exception;
 
-import org.example.userstories.model.PaymentNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.annotation.ExceptionHandler;

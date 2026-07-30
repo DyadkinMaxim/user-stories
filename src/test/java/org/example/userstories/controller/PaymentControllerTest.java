@@ -88,4 +88,15 @@ class PaymentControllerTest {
                 .andExpect(jsonPath("$.status").value("PENDING"))
                 .andExpect(jsonPath("$.id").isNotEmpty());
     }
+
+    @Test
+    void findAll_returnsEmptyListWhenNoPayments()
+            throws Exception {
+        when(paymentService.findAll())
+                .thenReturn(List.of());
+
+        mockMvc.perform(get("/api/v1/payments"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isEmpty());
+    }
 }

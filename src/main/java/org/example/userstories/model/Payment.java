@@ -3,6 +3,7 @@ package org.example.userstories.model;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -38,9 +39,14 @@ public class Payment {
     private String toIban;
 
     @Column(nullable = false)
-    private String status = "PENDING";
+    private String status;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @PrePersist
+    protected void onCreate() {
+        if (status == null) status = "PENDING";
+        if (createdAt == null) createdAt = LocalDateTime.now();
+    }
 }

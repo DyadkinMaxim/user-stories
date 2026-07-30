@@ -11,5 +11,8 @@ public interface PaymentMapper {
 
     PaymentResponse toResponse(Payment payment);
 
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "status", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
     Payment toEntity(PaymentRequest request);
 }

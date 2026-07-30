@@ -23,7 +23,6 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public Payment save(Payment payment) {
-        payment.setId(UUID.randomUUID());
         payment.setCreatedAt(LocalDateTime.now());
         return paymentRepository.save(payment);
     }

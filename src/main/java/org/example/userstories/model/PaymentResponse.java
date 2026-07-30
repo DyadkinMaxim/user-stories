@@ -1,9 +1,10 @@
-package org.example.userstories.payment;
+package org.example.userstories.model;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 public record PaymentResponse(
-        String id,
+        UUID id,
         Double amount,
         String currency,
         String accountId,

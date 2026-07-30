@@ -1,8 +1,8 @@
-package org.example.userstories.payment;
+package org.example.userstories.model;
 
 public class PaymentNotFoundException extends RuntimeException {
 
-    public PaymentNotFoundException(String id) {
+    public PaymentNotFoundException(java.util.UUID id) {
         super("Payment not found: " + id);
     }
 }

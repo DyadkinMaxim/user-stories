@@ -1,4 +1,4 @@
-package org.example.userstories.payment;
+package org.example.userstories.model;
 
 public record PaymentRequest(
         Double amount,

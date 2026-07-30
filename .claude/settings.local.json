@@ -1,7 +1,14 @@
 {
   "permissions": {
     "allow": [
-      "Bash(./mvnw compile *)"
+      "Bash(./mvnw compile *)",
+      "Bash(./mvnw dependency:copy-dependencies -DincludeArtifactIds=spring-boot-test-autoconfigure -DoutputDirectory=/tmp/deps -q)",
+      "Read(//tmp/**)",
+      "Bash(jar tf *)",
+      "Bash(./mvnw dependency:copy-dependencies -DincludeArtifactIds=spring-boot-test -DoutputDirectory=/tmp/deps -q)",
+      "Bash(./mvnw dependency:copy-dependencies -DincludeArtifactIds=spring-test -DoutputDirectory=/tmp/deps -q)",
+      "Bash(./mvnw dependency:copy-dependencies -DincludeArtifactIds=jackson-databind -DoutputDirectory=/tmp/deps -q)",
+      "Bash(./mvnw test *)"
     ]
   }
 }

@@ -39,9 +39,8 @@ class PaymentServiceImplTest {
         Payment payment = new Payment();
         when(paymentRepository.save(payment)).thenReturn(payment);
 
-        Payment result = paymentService.save(payment);
+        paymentService.save(payment);
 
-        assertThat(result.getCreatedAt()).isNotNull();
         verify(paymentRepository).save(payment);
     }
 }

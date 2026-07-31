@@ -35,8 +35,6 @@ class PaymentControllerTest {
     @MockitoBean
     private PaymentMapper paymentMapper;
 
-    @InjectMocks
-    private PaymentController controller;
 
     @Autowired
     private MockMvc mockMvc;
@@ -108,7 +106,7 @@ class PaymentControllerTest {
         when(paymentService.findById(any())).thenReturn(payment);
         when(paymentMapper.toResponse(payment)).thenReturn(response);
 
-        mockMvc.perform(get("/api/v1/payments/" + id))
+        mockMvc.perform(get("/api/v1/payments/{id}", id))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.amount").value(150.0))
                 .andExpect(jsonPath("$.currency").value("EUR"))
@@ -124,7 +122,7 @@ class PaymentControllerTest {
         UUID id = UUID.randomUUID();
         when(paymentService.findById(id)).thenThrow(new PaymentNotFoundException(id));
 
-        mockMvc.perform(get("/api/v1/payments/" + id))
+        mockMvc.perform(get("/api/v1/payments/{id}", id))
                 .andExpect(status().isNotFound());
 
     }

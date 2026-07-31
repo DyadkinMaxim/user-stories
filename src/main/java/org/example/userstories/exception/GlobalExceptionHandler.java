@@ -19,22 +19,22 @@ public class GlobalExceptionHandler {
         return problemDetail;
     }
 
-    @ExceptionHandler(Exception.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ProblemDetail handleNotFound(Exception ex) {
-        ProblemDetail problemDetail =
-                ProblemDetail.forStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-        problemDetail.setTitle("Error");
-        problemDetail.setDetail(ex.getMessage());
-        return problemDetail;
-    }
-
     @ExceptionHandler(IllegalStateException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public ProblemDetail handleConflict(Exception ex) {
         ProblemDetail problemDetail =
                 ProblemDetail.forStatus(HttpStatus.CONFLICT);
         problemDetail.setTitle("Conflict");
+        problemDetail.setDetail(ex.getMessage());
+        return problemDetail;
+    }
+
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ProblemDetail handleNotFound(Exception ex) {
+        ProblemDetail problemDetail =
+                ProblemDetail.forStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+        problemDetail.setTitle("Error");
         problemDetail.setDetail(ex.getMessage());
         return problemDetail;
     }

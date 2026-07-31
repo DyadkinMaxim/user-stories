@@ -37,15 +37,14 @@ public class PaymentController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<PaymentResponse> findById(@PathVariable final String id) {
+    public ResponseEntity<PaymentResponse> findById(@PathVariable final UUID id) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(paymentMapper.toResponse(
-                        paymentService.findById(UUID.fromString(id)))
+                        paymentService.findById(id))
                 );
     }
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<PaymentResponse> create(@RequestBody PaymentRequest request) {
         Payment saved = paymentService.save(paymentMapper.toEntity(request));
         return ResponseEntity.status(HttpStatus.CREATED)

@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -137,7 +138,7 @@ class PaymentControllerTest {
                 "DE89370400440532013000", PaymentStatus.APPROVED, LocalDateTime.now()
         );
 
-        when(paymentService.updateStatus(id, PaymentStatus.APPROVED)).thenReturn(updated);
+        when(paymentService.updateStatus(any(UUID.class), eq(PaymentStatus.APPROVED) )).thenReturn(updated);
         when(paymentMapper.toResponse(updated)).thenReturn(response);
 
         mockMvc.perform(patch("/api/v1/payments/{id}/status", id)

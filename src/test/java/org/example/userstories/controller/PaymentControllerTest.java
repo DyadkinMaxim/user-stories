@@ -1,51 +1,49 @@
 package org.example.userstories.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.example.userstories.exception.PaymentNotFoundException;
 import org.example.userstories.mapper.PaymentMapper;
 import org.example.userstories.model.Payment;
 import org.example.userstories.model.PaymentRequest;
 import org.example.userstories.model.PaymentResponse;
 import org.example.userstories.service.PaymentService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import tools.jackson.databind.ObjectMapper;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@ExtendWith(MockitoExtension.class)
+@WebMvcTest(PaymentController.class)
 class PaymentControllerTest {
 
-    @Mock
+    @MockitoBean
     private PaymentService paymentService;
 
-    @Mock
+    @MockitoBean
     private PaymentMapper paymentMapper;
 
     @InjectMocks
     private PaymentController controller;
 
+    @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
     private ObjectMapper objectMapper;
 
-    @BeforeEach
-    void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
-        objectMapper = new ObjectMapper();
-    }
 
     @Test
     void findAll_returnsOkWithPaymentList() throws Exception {
@@ -98,5 +96,36 @@ class PaymentControllerTest {
         mockMvc.perform(get("/api/v1/payments"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isEmpty());
+    }
+
+    @Test
+    void findById_returnsOkWithPayment() throws Exception {
+        Payment payment = new Payment();
+        UUID id = UUID.randomUUID();
+        PaymentResponse response = new PaymentResponse(id, 150.0, "EUR", "ACC-001",
+                "DE89370400440532013000", "PENDING", LocalDateTime.now());
+
+        when(paymentService.findById(any())).thenReturn(payment);
+        when(paymentMapper.toResponse(payment)).thenReturn(response);
+
+        mockMvc.perform(get("/api/v1/payments/" + id))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.amount").value(150.0))
+                .andExpect(jsonPath("$.currency").value("EUR"))
+                .andExpect(jsonPath("$.accountId").value("ACC-001"))
+                .andExpect(jsonPath("$.toIban").value("DE89370400440532013000"))
+                .andExpect(jsonPath("$.status").value("PENDING"));
+
+
+    }
+
+    @Test
+    void findById_whenPaymentNotFound_returns404() throws Exception {
+        UUID id = UUID.randomUUID();
+        when(paymentService.findById(id)).thenThrow(new PaymentNotFoundException(id));
+
+        mockMvc.perform(get("/api/v1/payments/" + id))
+                .andExpect(status().isNotFound());
+
     }
 }

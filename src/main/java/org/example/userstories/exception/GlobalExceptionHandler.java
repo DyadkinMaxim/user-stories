@@ -11,13 +11,31 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(PaymentNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ProblemDetail handlePaymentNotFound(PaymentNotFoundException ex) {
-        return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
+    public ProblemDetail handleNotFound(PaymentNotFoundException ex) {
+        ProblemDetail problemDetail =
+                ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
+        problemDetail.setTitle("Entity not found");
+        problemDetail.setDetail(ex.getMessage());
+        return problemDetail;
     }
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ProblemDetail handleGeneral(Exception ex) {
-        return ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
+    public ProblemDetail handleNotFound(Exception ex) {
+        ProblemDetail problemDetail =
+                ProblemDetail.forStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+        problemDetail.setTitle("Error");
+        problemDetail.setDetail(ex.getMessage());
+        return problemDetail;
+    }
+
+    @ExceptionHandler(IllegalStateException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ProblemDetail handleConflict(Exception ex) {
+        ProblemDetail problemDetail =
+                ProblemDetail.forStatus(HttpStatus.CONFLICT);
+        problemDetail.setTitle("Conflict");
+        problemDetail.setDetail(ex.getMessage());
+        return problemDetail;
     }
 }

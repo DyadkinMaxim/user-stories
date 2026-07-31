@@ -31,8 +31,8 @@ public class PaymentController {
 
     @GetMapping
     public ResponseEntity<List<PaymentResponse>> findAll() {
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(paymentService.findAll().stream()
+        return ResponseEntity.ok(
+                paymentService.findAll().stream()
                         .map(paymentMapper::toResponse)
                         .toList()
                 );
@@ -40,8 +40,8 @@ public class PaymentController {
 
     @GetMapping("/{id}")
     public ResponseEntity<PaymentResponse> findById(@PathVariable final UUID id) {
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(paymentMapper.toResponse(
+        return ResponseEntity.ok(
+                paymentMapper.toResponse(
                         paymentService.findById(id))
                 );
     }

@@ -5,15 +5,17 @@ import org.example.userstories.mapper.PaymentMapper;
 import org.example.userstories.model.Payment;
 import org.example.userstories.model.PaymentRequest;
 import org.example.userstories.model.PaymentResponse;
+import org.example.userstories.model.PaymentStatus;
 import org.example.userstories.service.PaymentService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -48,7 +50,14 @@ public class PaymentController {
     public ResponseEntity<PaymentResponse> create(@RequestBody PaymentRequest request) {
         Payment saved = paymentService.save(paymentMapper.toEntity(request));
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(paymentMapper.toResponse(saved)
-                );
+                .body(paymentMapper.toResponse(saved));
+    }
+
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<PaymentResponse> updateStatus(
+            @PathVariable UUID id,
+            @RequestParam PaymentStatus status) {
+        Payment updated = paymentService.updateStatus(id, status);
+        return ResponseEntity.ok(paymentMapper.toResponse(updated));
     }
 }

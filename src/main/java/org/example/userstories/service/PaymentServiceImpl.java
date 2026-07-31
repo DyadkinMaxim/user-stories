@@ -1,10 +1,12 @@
 package org.example.userstories.service;
 
 import lombok.RequiredArgsConstructor;
-import org.example.userstories.model.Payment;
 import org.example.userstories.exception.PaymentNotFoundException;
+import org.example.userstories.model.Payment;
+import org.example.userstories.model.PaymentStatus;
 import org.example.userstories.repository.PaymentRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -20,13 +22,23 @@ public class PaymentServiceImpl implements PaymentService {
         return paymentRepository.findAll();
     }
 
+    @Transactional
     @Override
     public Payment save(Payment payment) {
         return paymentRepository.save(payment);
     }
 
+    @Override
     public Payment findById(UUID id) {
         return paymentRepository.findById(id)
                 .orElseThrow(() -> new PaymentNotFoundException(id));
+    }
+
+    @Transactional
+    @Override
+    public Payment updateStatus(UUID id, PaymentStatus status) {
+        Payment payment = findById(id);
+        payment.setStatus(status);
+        return paymentRepository.save(payment);
     }
 }

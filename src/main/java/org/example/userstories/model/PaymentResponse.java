@@ -9,7 +9,7 @@ public record PaymentResponse(
         String currency,
         String accountId,
         String toIban,
-        String status,
+        PaymentStatus status,
         LocalDateTime createdAt
 ) {
     public static PaymentResponse from(Payment payment) {

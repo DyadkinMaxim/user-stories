@@ -2,13 +2,13 @@ package org.example.userstories.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.userstories.exception.PaymentNotFoundException;
+import org.example.userstories.model.PaymentStatus;
 import org.example.userstories.mapper.PaymentMapper;
 import org.example.userstories.model.Payment;
 import org.example.userstories.model.PaymentRequest;
 import org.example.userstories.model.PaymentResponse;
 import org.example.userstories.service.PaymentService;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
@@ -22,6 +22,7 @@ import java.util.UUID;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -48,7 +49,7 @@ class PaymentControllerTest {
         Payment payment = new Payment();
         PaymentResponse response = new PaymentResponse(
                 UUID.randomUUID(), 150.0, "EUR", "ACC-001",
-                "DE89370400440532013000", "PENDING", LocalDateTime.now()
+                "DE89370400440532013000", PaymentStatus.PENDING, LocalDateTime.now()
         );
 
         when(paymentService.findAll()).thenReturn(List.of(payment));
@@ -68,7 +69,7 @@ class PaymentControllerTest {
         Payment saved = new Payment();
         PaymentResponse response = new PaymentResponse(
                 UUID.randomUUID(), 200.0, "USD", "ACC-002",
-                "FR7630006000011234567890189", "PENDING", LocalDateTime.now()
+                "FR7630006000011234567890189", PaymentStatus.PENDING, LocalDateTime.now()
         );
 
         when(paymentMapper.toEntity(request)).thenReturn(entity);
@@ -101,7 +102,7 @@ class PaymentControllerTest {
         Payment payment = new Payment();
         UUID id = UUID.randomUUID();
         PaymentResponse response = new PaymentResponse(id, 150.0, "EUR", "ACC-001",
-                "DE89370400440532013000", "PENDING", LocalDateTime.now());
+                "DE89370400440532013000", PaymentStatus.PENDING, LocalDateTime.now());
 
         when(paymentService.findById(any())).thenReturn(payment);
         when(paymentMapper.toResponse(payment)).thenReturn(response);
@@ -124,6 +125,36 @@ class PaymentControllerTest {
                 .thenThrow(new PaymentNotFoundException(id));
 
         mockMvc.perform(get("/api/v1/payments/{id}", id))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void updateStatus_returnsOkWithUpdatedPayment() throws Exception {
+        UUID id = UUID.randomUUID();
+        Payment updated = new Payment();
+        PaymentResponse response = new PaymentResponse(
+                id, 150.0, "EUR", "ACC-001",
+                "DE89370400440532013000", PaymentStatus.APPROVED, LocalDateTime.now()
+        );
+
+        when(paymentService.updateStatus(id, PaymentStatus.APPROVED)).thenReturn(updated);
+        when(paymentMapper.toResponse(updated)).thenReturn(response);
+
+        mockMvc.perform(patch("/api/v1/payments/{id}/status", id)
+                        .param("status", PaymentStatus.APPROVED.toString()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("APPROVED"));
+    }
+
+    @Test
+    void updateStatus_whenPaymentNotFound_returns404() throws Exception {
+        UUID id = UUID.randomUUID();
+
+        when(paymentService.updateStatus(any(UUID.class), any(PaymentStatus.class)))
+                .thenThrow(new PaymentNotFoundException(id));
+
+        mockMvc.perform(patch("/api/v1/payments/{id}/status", id)
+                        .param("status", PaymentStatus.APPROVED.toString()))
                 .andExpect(status().isNotFound());
     }
 }

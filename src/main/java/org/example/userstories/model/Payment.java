@@ -2,6 +2,8 @@ package org.example.userstories.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
@@ -38,15 +40,16 @@ public class Payment {
     @Column(nullable = false)
     private String toIban;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String status;
+    private PaymentStatus status;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @PrePersist
     protected void onCreate() {
-        if (status == null) status = "PENDING";
+        if (status == null) status = PaymentStatus.PENDING;
         if (createdAt == null) createdAt = LocalDateTime.now();
     }
 }

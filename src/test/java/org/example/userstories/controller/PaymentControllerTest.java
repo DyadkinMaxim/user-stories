@@ -120,10 +120,10 @@ class PaymentControllerTest {
     @Test
     void findById_whenPaymentNotFound_returns404() throws Exception {
         UUID id = UUID.randomUUID();
-        when(paymentService.findById(id)).thenThrow(new PaymentNotFoundException(id));
+        when(paymentService.findById(any(UUID.class)))
+                .thenThrow(new PaymentNotFoundException(id));
 
         mockMvc.perform(get("/api/v1/payments/{id}", id))
                 .andExpect(status().isNotFound());
-
     }
 }

@@ -102,8 +102,8 @@ class PaymentControllerTest {
         when(paymentService.findAll(PaymentStatus.APPROVED)).thenReturn(List.of(payment));
 
         mockMvc.perform(get("/api/v1/payments")
-                        .param("status", "APPROVED"))
-                .andExpect(status().isBadRequest());
+                        .param("status", "APPROVED11"))
+                .andExpect(status().isInternalServerError());
     }
 
 

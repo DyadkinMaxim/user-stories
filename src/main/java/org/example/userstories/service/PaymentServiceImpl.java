@@ -19,13 +19,9 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public List<Payment> findAll(PaymentStatus status) {
-        List<Payment> payments;
-        if(status == null) {
-            payments = paymentRepository.findAll();
-        } else {
-            payments = paymentRepository.findAllByStatus(status);
-        }
-        return payments;
+        return status == null
+                ? paymentRepository.findAll()
+                : paymentRepository.findAllByStatus(status);
     }
 
     @Transactional

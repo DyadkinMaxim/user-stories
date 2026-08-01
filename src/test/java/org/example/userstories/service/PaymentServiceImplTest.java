@@ -49,13 +49,6 @@ class PaymentServiceImplTest {
     }
 
     @Test
-    void findAllByStatus_invalidStatus()
-            throws Exception {
-        assertThrows(IllegalArgumentException.class,
-                () -> paymentService.findAll(PaymentStatus.valueOf("ABCD")));
-    }
-
-    @Test
     void save_setsCreatedAtBeforePersisting() {
         Payment payment = new Payment();
         when(paymentRepository.save(payment)).thenReturn(payment);

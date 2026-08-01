@@ -18,8 +18,14 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentRepository paymentRepository;
 
     @Override
-    public List<Payment> findAll() {
-        return paymentRepository.findAll();
+    public List<Payment> findAll(PaymentStatus status) {
+        List<Payment> payments;
+        if(status == null) {
+            payments = paymentRepository.findAll();
+        } else {
+            payments = paymentRepository.findAllByStatus(status);
+        }
+        return payments;
     }
 
     @Transactional

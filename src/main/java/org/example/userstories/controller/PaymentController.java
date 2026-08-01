@@ -30,9 +30,11 @@ public class PaymentController {
     private final PaymentMapper paymentMapper;
 
     @GetMapping
-    public ResponseEntity<List<PaymentResponse>> findAll() {
+    public ResponseEntity<List<PaymentResponse>> findAll(
+            @RequestParam(required = false) PaymentStatus status
+    ) {
         return ResponseEntity.ok(
-                paymentService.findAll().stream()
+                paymentService.findAll(status).stream()
                         .map(paymentMapper::toResponse)
                         .toList()
                 );

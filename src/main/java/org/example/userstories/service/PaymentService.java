@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public interface PaymentService {
 
-    List<Payment> findAll();
+    List<Payment> findAll(PaymentStatus status);
 
     Payment findById(UUID id);
 

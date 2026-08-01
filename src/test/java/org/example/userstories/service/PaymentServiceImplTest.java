@@ -1,6 +1,7 @@
 package org.example.userstories.service;
 
 import org.example.userstories.model.Payment;
+import org.example.userstories.model.PaymentStatus;
 import org.example.userstories.repository.PaymentRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,6 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -28,10 +30,29 @@ class PaymentServiceImplTest {
         Payment payment = new Payment();
         when(paymentRepository.findAll()).thenReturn(List.of(payment));
 
-        List<Payment> result = paymentService.findAll();
+        List<Payment> result = paymentService.findAll(null);
 
         assertThat(result).hasSize(1).containsExactly(payment);
         verify(paymentRepository).findAll();
+    }
+
+    @Test
+    void findAllByStatus_returnsAllByStatus()
+            throws Exception {
+        Payment payment = new Payment();
+        when(paymentRepository.findAllByStatus(PaymentStatus.PENDING)).thenReturn(List.of(payment));
+
+        List<Payment> result = paymentService.findAll(PaymentStatus.PENDING);
+
+        assertThat(result).hasSize(1).containsExactly(payment);
+        verify(paymentRepository).findAllByStatus(PaymentStatus.PENDING);
+    }
+
+    @Test
+    void findAllByStatus_invalidStatus()
+            throws Exception {
+        assertThrows(IllegalArgumentException.class,
+                () -> paymentService.findAll(PaymentStatus.valueOf("ABCD")));
     }
 
     @Test

@@ -2,11 +2,11 @@ package org.example.userstories.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.userstories.exception.PaymentNotFoundException;
-import org.example.userstories.model.PaymentStatus;
 import org.example.userstories.mapper.PaymentMapper;
 import org.example.userstories.model.Payment;
 import org.example.userstories.model.PaymentRequest;
 import org.example.userstories.model.PaymentResponse;
+import org.example.userstories.model.PaymentStatus;
 import org.example.userstories.service.PaymentService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +21,7 @@ import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -53,7 +54,7 @@ class PaymentControllerTest {
                 "DE89370400440532013000", PaymentStatus.PENDING, LocalDateTime.now()
         );
 
-        when(paymentService.findAll()).thenReturn(List.of(payment));
+        when(paymentService.findAll(null)).thenReturn(List.of(payment));
         when(paymentMapper.toResponse(payment)).thenReturn(response);
 
         mockMvc.perform(get("/api/v1/payments"))
@@ -62,6 +63,50 @@ class PaymentControllerTest {
                 .andExpect(jsonPath("$[0].currency").value("EUR"))
                 .andExpect(jsonPath("$[0].status").value("PENDING"));
     }
+
+    @Test
+    void findAll_returnsEmptyListWhenNoPayments()
+            throws Exception {
+        when(paymentService.findAll(null))
+                .thenReturn(List.of());
+
+        mockMvc.perform(get("/api/v1/payments"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isEmpty());
+    }
+
+    @Test
+    void findAllByStatus_returnsAllByStatus()
+            throws Exception {
+        Payment payment = new Payment();
+        PaymentResponse response = new PaymentResponse(
+                UUID.randomUUID(), 150.0, "EUR", "ACC-001",
+                "DE89370400440532013000", PaymentStatus.APPROVED, LocalDateTime.now()
+        );
+
+        when(paymentService.findAll(PaymentStatus.APPROVED)).thenReturn(List.of(payment));
+        when(paymentMapper.toResponse(payment)).thenReturn(response);
+
+        mockMvc.perform(get("/api/v1/payments")
+                        .param("status", "APPROVED"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].amount").value(150.0))
+                .andExpect(jsonPath("$[0].currency").value("EUR"))
+                .andExpect(jsonPath("$[0].status").value("APPROVED"));
+    }
+
+    @Test
+    void findAllByStatus_invalidStatus()
+            throws Exception {
+        Payment payment = new Payment();
+
+        when(paymentService.findAll(PaymentStatus.APPROVED)).thenReturn(List.of(payment));
+
+        mockMvc.perform(get("/api/v1/payments")
+                        .param("status", "APPROVED"))
+                .andExpect(status().isBadRequest());
+    }
+
 
     @Test
     void create_returnsCreatedWithSavedPayment() throws Exception {
@@ -85,17 +130,6 @@ class PaymentControllerTest {
                 .andExpect(jsonPath("$.currency").value("USD"))
                 .andExpect(jsonPath("$.status").value("PENDING"))
                 .andExpect(jsonPath("$.id").isNotEmpty());
-    }
-
-    @Test
-    void findAll_returnsEmptyListWhenNoPayments()
-            throws Exception {
-        when(paymentService.findAll())
-                .thenReturn(List.of());
-
-        mockMvc.perform(get("/api/v1/payments"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isEmpty());
     }
 
     @Test

@@ -103,9 +103,8 @@ class PaymentControllerTest {
 
         mockMvc.perform(get("/api/v1/payments")
                         .param("status", "APPROVED11"))
-                .andExpect(status().isInternalServerError());
+                .andExpect(status().isBadRequest());
     }
-
 
     @Test
     void create_returnsCreatedWithSavedPayment() throws Exception {

@@ -8,7 +8,8 @@
       "Bash(./mvnw dependency:copy-dependencies -DincludeArtifactIds=spring-boot-test -DoutputDirectory=/tmp/deps -q)",
       "Bash(./mvnw dependency:copy-dependencies -DincludeArtifactIds=spring-test -DoutputDirectory=/tmp/deps -q)",
       "Bash(./mvnw dependency:copy-dependencies -DincludeArtifactIds=jackson-databind -DoutputDirectory=/tmp/deps -q)",
-      "Bash(./mvnw test *)"
+      "Bash(./mvnw test *)",
+      "Bash(mvn test *)"
     ]
   }
 }

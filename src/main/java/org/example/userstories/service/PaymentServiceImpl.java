@@ -43,4 +43,17 @@ public class PaymentServiceImpl implements PaymentService {
         payment.setStatus(status);
         return paymentRepository.save(payment);
     }
+
+    @Override
+    public void deletePaymentForce(UUID id) {
+        findById(id);
+        paymentRepository.deleteById(id);
+    }
+
+    @Override
+    @Transactional
+    public void deletePaymentSoft(UUID id) {
+        findById(id);
+        updateStatus(id, PaymentStatus.CANCELLED);
+    }
 }

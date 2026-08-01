@@ -9,6 +9,7 @@ import org.example.userstories.model.PaymentStatus;
 import org.example.userstories.service.PaymentService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -62,4 +63,17 @@ public class PaymentController {
         Payment updated = paymentService.updateStatus(id, status);
         return ResponseEntity.ok(paymentMapper.toResponse(updated));
     }
+
+    @DeleteMapping("/physique/{id}")
+    public ResponseEntity<Void> deletePaymentForce(@PathVariable UUID id) {
+        paymentService.deletePaymentForce(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/soft/{id}")
+    public ResponseEntity<Void> deletePaymentSoft(@PathVariable UUID id) {
+        paymentService.deletePaymentSoft(id);
+        return ResponseEntity.noContent().build();
+    }
+
 }

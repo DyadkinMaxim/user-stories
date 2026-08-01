@@ -21,7 +21,9 @@ import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -188,6 +190,42 @@ class PaymentControllerTest {
 
         mockMvc.perform(patch("/api/v1/payments/{id}/status", id)
                         .param("status", PaymentStatus.APPROVED.toString()))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void deletePaymentSoft_returnsNoContent() throws Exception {
+        UUID id = UUID.randomUUID();
+
+        mockMvc.perform(delete("/api/v1/payments/soft/{id}", id))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void deletePaymentSoft_whenPaymentNotFound_returns404() throws Exception {
+        UUID id = UUID.randomUUID();
+        doThrow(new PaymentNotFoundException(id))
+                .when(paymentService).deletePaymentSoft(any(UUID.class));
+
+        mockMvc.perform(delete("/api/v1/payments/soft/{id}", id))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void deletePaymentForce_returnsNoContent() throws Exception {
+        UUID id = UUID.randomUUID();
+
+        mockMvc.perform(delete("/api/v1/payments/physique/{id}", id))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void deletePaymentForce_whenPaymentNotFound_returns404() throws Exception {
+        UUID id = UUID.randomUUID();
+        doThrow(new PaymentNotFoundException(id))
+                .when(paymentService).deletePaymentForce(any(UUID.class));
+
+        mockMvc.perform(delete("/api/v1/payments/physique/{id}", id))
                 .andExpect(status().isNotFound());
     }
 }

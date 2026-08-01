@@ -64,15 +64,15 @@ public class PaymentController {
         return ResponseEntity.ok(paymentMapper.toResponse(updated));
     }
 
-    @DeleteMapping("/physique/{id}")
+    @DeleteMapping("/hard/{id}")
     public ResponseEntity<Void> deletePaymentForce(@PathVariable UUID id) {
-        paymentService.deletePaymentForce(id);
+        paymentService.hardDelete(id);
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/soft/{id}")
     public ResponseEntity<Void> deletePaymentSoft(@PathVariable UUID id) {
-        paymentService.deletePaymentSoft(id);
+        paymentService.softDelete(id);
         return ResponseEntity.noContent().build();
     }
 

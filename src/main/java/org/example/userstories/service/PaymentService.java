@@ -16,7 +16,7 @@ public interface PaymentService {
 
     Payment updateStatus(UUID id, PaymentStatus status);
 
-    void deletePaymentForce(UUID id);
+    void hardDelete(UUID id);
 
-    void deletePaymentSoft(UUID id);
+    void softDelete(UUID id);
 }

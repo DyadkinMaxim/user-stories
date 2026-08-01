@@ -205,7 +205,7 @@ class PaymentControllerTest {
     void deletePaymentSoft_whenPaymentNotFound_returns404() throws Exception {
         UUID id = UUID.randomUUID();
         doThrow(new PaymentNotFoundException(id))
-                .when(paymentService).deletePaymentSoft(any(UUID.class));
+                .when(paymentService).softDelete(any(UUID.class));
 
         mockMvc.perform(delete("/api/v1/payments/soft/{id}", id))
                 .andExpect(status().isNotFound());
@@ -223,7 +223,7 @@ class PaymentControllerTest {
     void deletePaymentForce_whenPaymentNotFound_returns404() throws Exception {
         UUID id = UUID.randomUUID();
         doThrow(new PaymentNotFoundException(id))
-                .when(paymentService).deletePaymentForce(any(UUID.class));
+                .when(paymentService).hardDelete(any(UUID.class));
 
         mockMvc.perform(delete("/api/v1/payments/physique/{id}", id))
                 .andExpect(status().isNotFound());

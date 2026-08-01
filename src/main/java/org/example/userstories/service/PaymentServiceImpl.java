@@ -45,15 +45,15 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public void deletePaymentForce(UUID id) {
+    @Transactional
+    public void hardDelete(UUID id) {
         findById(id);
         paymentRepository.deleteById(id);
     }
 
     @Override
     @Transactional
-    public void deletePaymentSoft(UUID id) {
-        findById(id);
+    public void softDelete(UUID id) {
         updateStatus(id, PaymentStatus.CANCELLED);
     }
 }

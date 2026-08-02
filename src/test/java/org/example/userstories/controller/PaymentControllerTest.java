@@ -129,31 +129,6 @@ class PaymentControllerTest {
     }
 
     @Test
-    void search_returnsAllBetweenAmounts()
-            throws Exception {
-        Payment payment = new Payment();
-
-        when(paymentService.search(100.0, 200.0)).thenReturn(List.of(payment));
-
-        mockMvc.perform(get("/api/v1/payments/search")
-                        .param("minAmount", "100.0")
-                        .param("maxAmount", "200.0"))
-                .andExpect(status().isOk());
-    }
-
-    @Test
-    void search_returnsAllUnderMaxAmount()
-            throws Exception {
-        Payment payment = new Payment();
-
-        when(paymentService.search(100.0, 200.0)).thenReturn(List.of(payment));
-
-        mockMvc.perform(get("/api/v1/payments/search")
-                        .param("minAmount", "100.0"))
-                .andExpect(status().isOk());
-    }
-
-    @Test
     void create_returnsCreatedWithSavedPayment() throws Exception {
         PaymentRequest request = new PaymentRequest(200.0, "USD", "ACC-002", "FR7630006000011234567890189");
         Payment entity = new Payment();

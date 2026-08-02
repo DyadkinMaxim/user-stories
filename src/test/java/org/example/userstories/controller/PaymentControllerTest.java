@@ -144,7 +144,8 @@ class PaymentControllerTest {
         when(paymentService.search(100.0, 200.0)).thenReturn(List.of(payment));
 
         mockMvc.perform(get("/api/v1/payments/search")
-                        .param("minAmount", "100.0"))
+                        .param("minAmount", "100.0")
+                        .param("maxAmount", ""))
                 .andExpect(status().isOk());
     }
 

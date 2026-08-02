@@ -52,14 +52,23 @@ public class PaymentServiceImpl implements PaymentService {
 
         if (status != null) {
             predicates.add(
-                    cb.equal(cb.lower(root.get("status")),
-                            status)
+                    cb.equal(root.get("status"), status)
             );
         }
 
         if (minAmount != null && maxAmount != null) {
             predicates.add(
                     cb.between(root.get("amount"), minAmount, maxAmount)
+            );
+        }
+        if (minAmount != null && maxAmount == null) {
+            predicates.add(
+                    cb.greaterThan(root.get("amount"), minAmount)
+            );
+        }
+        if (minAmount == null && maxAmount != null) {
+            predicates.add(
+                    cb.lessThan(root.get("amount"), maxAmount)
             );
         }
         return predicates;

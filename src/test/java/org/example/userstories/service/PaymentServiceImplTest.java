@@ -76,7 +76,7 @@ class PaymentServiceImplTest {
 
         paymentService.updatePaymentDetails(uuid, paymentUpdateRequest);
 
-        verify(paymentMapper).toEntity(paymentUpdateRequest, payment);
+        verify(paymentMapper).updateEntity(paymentUpdateRequest, payment);
         verify(paymentRepository).save(payment);
     }
 }

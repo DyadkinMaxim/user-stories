@@ -2,8 +2,10 @@ package org.example.userstories.service;
 
 import lombok.RequiredArgsConstructor;
 import org.example.userstories.exception.PaymentNotFoundException;
+import org.example.userstories.mapper.PaymentMapper;
 import org.example.userstories.model.Payment;
 import org.example.userstories.model.PaymentStatus;
+import org.example.userstories.model.PaymentUpdateRequest;
 import org.example.userstories.repository.PaymentRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +18,7 @@ import java.util.UUID;
 public class PaymentServiceImpl implements PaymentService {
 
     private final PaymentRepository paymentRepository;
+    private final PaymentMapper paymentMapper;
 
     @Override
     public List<Payment> findAll(PaymentStatus status) {
@@ -42,6 +45,14 @@ public class PaymentServiceImpl implements PaymentService {
         Payment payment = findById(id);
         payment.setStatus(status);
         return paymentRepository.save(payment);
+    }
+
+    @Transactional
+    @Override
+    public Payment updatePaymentDetails(UUID id, PaymentUpdateRequest details) {
+        Payment paymentById = findById(id);
+        paymentById = paymentMapper.toEntity(details);
+        return paymentRepository.save(paymentById);
     }
 
     @Override

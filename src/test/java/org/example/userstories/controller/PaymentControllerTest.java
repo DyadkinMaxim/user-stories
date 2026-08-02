@@ -7,6 +7,7 @@ import org.example.userstories.model.Payment;
 import org.example.userstories.model.PaymentRequest;
 import org.example.userstories.model.PaymentResponse;
 import org.example.userstories.model.PaymentStatus;
+import org.example.userstories.model.PaymentUpdateRequest;
 import org.example.userstories.service.PaymentService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -45,6 +47,8 @@ class PaymentControllerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+    @Autowired
+    private PaymentController paymentController;
 
 
     @Test
@@ -191,6 +195,34 @@ class PaymentControllerTest {
         mockMvc.perform(patch("/api/v1/payments/{id}/status", id)
                         .param("status", PaymentStatus.APPROVED.toString()))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void updatePaymentDetails_returnsOkWithUpdatedPayment() throws Exception {
+        UUID id = UUID.randomUUID();
+        Payment updated = new Payment();
+        PaymentUpdateRequest request = new PaymentUpdateRequest(
+                200.0, "USD", "ACC-002",
+                "DE89370400440532013001"
+        );
+        PaymentResponse response = new PaymentResponse(
+                id, 200.0, "USD", "ACC-002",
+                "DE89370400440532013001", PaymentStatus.APPROVED, LocalDateTime.now()
+        );
+
+        when(paymentService.updatePaymentDetails(
+                any(UUID.class), any(PaymentUpdateRequest.class))).thenReturn(updated);
+        when(paymentMapper.toResponse(updated)).thenReturn(response);
+
+        mockMvc.perform(put("/api/v1/payments/{id}", id)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.amount").value(200.0))
+                .andExpect(jsonPath("$.currency").value("USD"))
+                .andExpect(jsonPath("$.accountId").value("ACC-002"))
+                .andExpect(jsonPath("$.toIban").value("DE89370400440532013001"))
+                .andExpect(jsonPath("$.status").value("APPROVED"));
     }
 
     @Test

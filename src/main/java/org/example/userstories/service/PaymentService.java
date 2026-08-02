@@ -11,8 +11,6 @@ public interface PaymentService {
 
     List<Payment> findAll(PaymentStatus status, Double minAmount, Double maxAmount);
 
-    List<Payment> search(Double minAmount, Double maxAmount);
-
     Payment findById(UUID id);
 
     Payment save(Payment payment);

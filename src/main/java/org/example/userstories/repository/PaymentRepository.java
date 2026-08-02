@@ -13,5 +13,4 @@ public interface PaymentRepository extends JpaRepository<Payment, UUID> {
 
     List<Payment> findAllByStatus(final PaymentStatus status);
 
-    List<Payment> searchPaymentByAmountBetween(final Double minAmount, final Double maxAmount);
 }

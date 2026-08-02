@@ -45,18 +45,6 @@ public class PaymentController {
                 );
     }
 
-    @GetMapping("/search")
-    public ResponseEntity<List<PaymentResponse>> search(
-            @RequestParam(required = false) Double minAmount,
-            @RequestParam(required = false) Double maxAmount
-    ) {
-        return ResponseEntity.ok(
-                paymentService.search(minAmount, maxAmount).stream()
-                        .map(paymentMapper::toResponse)
-                        .toList()
-        );
-    }
-
     @GetMapping("/{id}")
     public ResponseEntity<PaymentResponse> findById(@PathVariable final UUID id) {
         return ResponseEntity.ok(

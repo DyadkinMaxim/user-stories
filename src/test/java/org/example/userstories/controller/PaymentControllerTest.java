@@ -115,12 +115,17 @@ class PaymentControllerTest {
         Payment payment = new Payment();
 
         when(paymentService.findAll(PaymentStatus.APPROVED, 100.0, 200.0)).thenReturn(List.of(payment));
+        when(paymentMapper.toResponse(payment)).thenReturn(
+                new PaymentResponse(UUID.randomUUID(), 150.0, "EUR", "1234",
+                        "AB12", PaymentStatus.APPROVED, LocalDateTime.now()));
+
 
         mockMvc.perform(get("/api/v1/payments")
                         .param("status", "APPROVED")
                         .param("minAmount", "100.0")
                         .param("maxAmount", "200.0"))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].amount").value(150.0));
     }
 
     @Test
@@ -144,8 +149,7 @@ class PaymentControllerTest {
         when(paymentService.search(100.0, 200.0)).thenReturn(List.of(payment));
 
         mockMvc.perform(get("/api/v1/payments/search")
-                        .param("minAmount", "100.0")
-                        .param("maxAmount", ""))
+                        .param("minAmount", "100.0"))
                 .andExpect(status().isOk());
     }
 

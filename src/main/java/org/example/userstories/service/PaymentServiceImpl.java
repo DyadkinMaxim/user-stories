@@ -55,28 +55,17 @@ public class PaymentServiceImpl implements PaymentService {
                     cb.equal(root.get("status"), status)
             );
         }
-
-        if (minAmount != null && maxAmount != null) {
+        if (minAmount != null) {
             predicates.add(
-                    cb.between(root.get("amount"), minAmount, maxAmount)
+                    cb.greaterThanOrEqualTo(root.get("amount"), minAmount)
             );
         }
-        if (minAmount != null && maxAmount == null) {
+        if (minAmount == null) {
             predicates.add(
-                    cb.greaterThan(root.get("amount"), minAmount)
-            );
-        }
-        if (minAmount == null && maxAmount != null) {
-            predicates.add(
-                    cb.lessThan(root.get("amount"), maxAmount)
+                    cb.lessThanOrEqualTo(root.get("amount"), maxAmount)
             );
         }
         return predicates;
-    }
-
-    @Override
-    public List<Payment> search(final Double minAmount, final Double maxAmount) {
-      return paymentRepository.searchPaymentByAmountBetween(minAmount, maxAmount);
     }
 
     @Transactional

@@ -129,6 +129,57 @@ class PaymentControllerTest {
     }
 
     @Test
+    void findAllByAmount_returnsAllAboveMin()
+            throws Exception {
+        Payment payment = new Payment();
+
+        when(paymentService.findAll(PaymentStatus.APPROVED, 100.0, null)).thenReturn(List.of(payment));
+        when(paymentMapper.toResponse(payment)).thenReturn(
+                new PaymentResponse(UUID.randomUUID(), 150.0, "EUR", "1234",
+                        "AB12", PaymentStatus.APPROVED, LocalDateTime.now()));
+
+        mockMvc.perform(get("/api/v1/payments")
+                        .param("status", "APPROVED")
+                        .param("minAmount", "100.0"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].amount").value(150.0));
+    }
+
+    @Test
+    void findAllByAmount_returnsAllWithoutStatus()
+            throws Exception {
+        Payment payment = new Payment();
+
+        when(paymentService.findAll(null, 100.0, 200.0)).thenReturn(List.of(payment));
+        when(paymentMapper.toResponse(payment)).thenReturn(
+                new PaymentResponse(UUID.randomUUID(), 150.0, "EUR", "1234",
+                        "AB12", PaymentStatus.APPROVED, LocalDateTime.now()));
+
+        mockMvc.perform(get("/api/v1/payments")
+                        .param("minAmount", "100.0")
+                        .param("maxAmount", "200.0"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].amount").value(150.0));
+    }
+
+    @Test
+    void findAllByAmount_returnsAllLowerMax()
+            throws Exception {
+        Payment payment = new Payment();
+
+        when(paymentService.findAll(PaymentStatus.APPROVED, null, 200.0)).thenReturn(List.of(payment));
+        when(paymentMapper.toResponse(payment)).thenReturn(
+                new PaymentResponse(UUID.randomUUID(), 150.0, "EUR", "1234",
+                        "AB12", PaymentStatus.APPROVED, LocalDateTime.now()));
+
+        mockMvc.perform(get("/api/v1/payments")
+                        .param("status", "APPROVED")
+                        .param("maxAmount", "200.0"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].amount").value(150.0));
+    }
+
+    @Test
     void create_returnsCreatedWithSavedPayment() throws Exception {
         PaymentRequest request = new PaymentRequest(200.0, "USD", "ACC-002", "FR7630006000011234567890189");
         Payment entity = new Payment();

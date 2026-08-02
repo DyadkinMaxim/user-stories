@@ -9,7 +9,9 @@ import java.util.UUID;
 
 public interface PaymentService {
 
-    List<Payment> findAll(PaymentStatus status);
+    List<Payment> findAll(PaymentStatus status, Double minAmount, Double maxAmount);
+
+    List<Payment> search(Double minAmount, Double maxAmount);
 
     Payment findById(UUID id);
 

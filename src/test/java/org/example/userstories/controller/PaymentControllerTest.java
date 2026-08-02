@@ -41,7 +41,6 @@ class PaymentControllerTest {
     @MockitoBean
     private PaymentMapper paymentMapper;
 
-
     @Autowired
     private MockMvc mockMvc;
 
@@ -57,7 +56,7 @@ class PaymentControllerTest {
                 "DE89370400440532013000", PaymentStatus.PENDING, LocalDateTime.now()
         );
 
-        when(paymentService.findAll(null)).thenReturn(List.of(payment));
+        when(paymentService.findAll(null, null, null)).thenReturn(List.of(payment));
         when(paymentMapper.toResponse(payment)).thenReturn(response);
 
         mockMvc.perform(get("/api/v1/payments"))
@@ -70,7 +69,7 @@ class PaymentControllerTest {
     @Test
     void findAll_returnsEmptyListWhenNoPayments()
             throws Exception {
-        when(paymentService.findAll(null))
+        when(paymentService.findAll(null, null, null))
                 .thenReturn(List.of());
 
         mockMvc.perform(get("/api/v1/payments"))
@@ -87,7 +86,7 @@ class PaymentControllerTest {
                 "DE89370400440532013000", PaymentStatus.APPROVED, LocalDateTime.now()
         );
 
-        when(paymentService.findAll(PaymentStatus.APPROVED)).thenReturn(List.of(payment));
+        when(paymentService.findAll(PaymentStatus.APPROVED, null , null)).thenReturn(List.of(payment));
         when(paymentMapper.toResponse(payment)).thenReturn(response);
 
         mockMvc.perform(get("/api/v1/payments")
@@ -103,11 +102,38 @@ class PaymentControllerTest {
             throws Exception {
         Payment payment = new Payment();
 
-        when(paymentService.findAll(PaymentStatus.APPROVED)).thenReturn(List.of(payment));
+        when(paymentService.findAll(PaymentStatus.APPROVED, null, null)).thenReturn(List.of(payment));
 
         mockMvc.perform(get("/api/v1/payments")
                         .param("status", "APPROVED11"))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void findAllByAmount_returnsAllBetweenAmounts()
+            throws Exception {
+        Payment payment = new Payment();
+
+        when(paymentService.findAll(PaymentStatus.APPROVED, 100.0, 200.0)).thenReturn(List.of(payment));
+
+        mockMvc.perform(get("/api/v1/payments")
+                        .param("status", "APPROVED")
+                        .param("minAmount", "100.0")
+                        .param("maxAmount", "200.0"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void search_returnsAllBetweenAmounts()
+            throws Exception {
+        Payment payment = new Payment();
+
+        when(paymentService.findAll(PaymentStatus.APPROVED, 100.0, 200.0)).thenReturn(List.of(payment));
+
+        mockMvc.perform(get("/api/v1/payments/search")
+                        .param("minAmount", "100.0")
+                        .param("maxAmount", "200.0"))
+                .andExpect(status().isOk());
     }
 
     @Test

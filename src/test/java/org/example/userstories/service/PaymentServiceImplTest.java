@@ -36,7 +36,7 @@ class PaymentServiceImplTest {
         Payment payment = new Payment();
         when(paymentRepository.findAll()).thenReturn(List.of(payment));
 
-        List<Payment> result = paymentService.findAll(null);
+        List<Payment> result = paymentService.findAll(null, null, null);
 
         assertThat(result).hasSize(1).containsExactly(payment);
         verify(paymentRepository).findAll();
@@ -48,7 +48,7 @@ class PaymentServiceImplTest {
         Payment payment = new Payment();
         when(paymentRepository.findAllByStatus(PaymentStatus.PENDING)).thenReturn(List.of(payment));
 
-        List<Payment> result = paymentService.findAll(PaymentStatus.PENDING);
+        List<Payment> result = paymentService.findAll(PaymentStatus.PENDING, null, null);
 
         assertThat(result).hasSize(1).containsExactly(payment);
         verify(paymentRepository).findAllByStatus(PaymentStatus.PENDING);

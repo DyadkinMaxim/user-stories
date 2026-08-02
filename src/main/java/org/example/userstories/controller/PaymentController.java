@@ -34,13 +34,27 @@ public class PaymentController {
 
     @GetMapping
     public ResponseEntity<List<PaymentResponse>> findAll(
-            @RequestParam(required = false) PaymentStatus status
+            @RequestParam(required = false) PaymentStatus status,
+            @RequestParam(required = false) Double minAmount,
+            @RequestParam(required = false) Double maxAmount
     ) {
         return ResponseEntity.ok(
-                paymentService.findAll(status).stream()
+                paymentService.findAll(status, minAmount, maxAmount).stream()
                         .map(paymentMapper::toResponse)
                         .toList()
                 );
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<PaymentResponse>> search(
+            @RequestParam Double minAmount,
+            @RequestParam Double maxAmount
+    ) {
+        return ResponseEntity.ok(
+                paymentService.search(minAmount, maxAmount).stream()
+                        .map(paymentMapper::toResponse)
+                        .toList()
+        );
     }
 
     @GetMapping("/{id}")

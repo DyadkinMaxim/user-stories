@@ -60,7 +60,7 @@ public class PaymentServiceImpl implements PaymentService {
                     cb.greaterThanOrEqualTo(root.get("amount"), minAmount)
             );
         }
-        if (minAmount != null) {
+        if (maxAmount != null) {
             predicates.add(
                     cb.lessThanOrEqualTo(root.get("amount"), maxAmount)
             );

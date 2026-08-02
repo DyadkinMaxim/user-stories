@@ -47,8 +47,8 @@ public class PaymentController {
 
     @GetMapping("/search")
     public ResponseEntity<List<PaymentResponse>> search(
-            @RequestParam Double minAmount,
-            @RequestParam Double maxAmount
+            @RequestParam(required = false) Double minAmount,
+            @RequestParam(required = false) Double maxAmount
     ) {
         return ResponseEntity.ok(
                 paymentService.search(minAmount, maxAmount).stream()

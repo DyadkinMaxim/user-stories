@@ -54,7 +54,7 @@ public class PaymentServiceImpl implements PaymentService {
         if (status != null) {
             predicates.add(
                     cb.equal(cb.lower(root.get("status")),
-                            status.toString().toLowerCase())
+                            status)
             );
         }
 

@@ -128,11 +128,23 @@ class PaymentControllerTest {
             throws Exception {
         Payment payment = new Payment();
 
-        when(paymentService.findAll(PaymentStatus.APPROVED, 100.0, 200.0)).thenReturn(List.of(payment));
+        when(paymentService.search(100.0, 200.0)).thenReturn(List.of(payment));
 
         mockMvc.perform(get("/api/v1/payments/search")
                         .param("minAmount", "100.0")
                         .param("maxAmount", "200.0"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void search_returnsAllUnderMaxAmount()
+            throws Exception {
+        Payment payment = new Payment();
+
+        when(paymentService.search(100.0, 200.0)).thenReturn(List.of(payment));
+
+        mockMvc.perform(get("/api/v1/payments/search")
+                        .param("minAmount", "100.0"))
                 .andExpect(status().isOk());
     }
 

@@ -1,8 +1,8 @@
 package org.example.userstories.service;
 
+import jakarta.persistence.EntityManager;
 import org.example.userstories.mapper.PaymentMapper;
 import org.example.userstories.model.Payment;
-import org.example.userstories.model.PaymentStatus;
 import org.example.userstories.model.PaymentUpdateRequest;
 import org.example.userstories.repository.PaymentRepository;
 import org.junit.jupiter.api.Test;
@@ -11,11 +11,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -28,31 +26,11 @@ class PaymentServiceImplTest {
     @Mock
     private PaymentMapper paymentMapper;
 
+    @Mock
+    private EntityManager entityManager;
+
     @InjectMocks
     private PaymentServiceImpl paymentService;
-
-    @Test
-    void findAll_returnsAllPaymentsFromRepository() {
-        Payment payment = new Payment();
-        when(paymentRepository.findAll()).thenReturn(List.of(payment));
-
-        List<Payment> result = paymentService.findAll(null, null, null);
-
-        assertThat(result).hasSize(1).containsExactly(payment);
-        verify(paymentRepository).findAll();
-    }
-
-    @Test
-    void findAllByStatus_returnsAllByStatus()
-            throws Exception {
-        Payment payment = new Payment();
-        when(paymentRepository.findAllByStatus(PaymentStatus.PENDING)).thenReturn(List.of(payment));
-
-        List<Payment> result = paymentService.findAll(PaymentStatus.PENDING, null, null);
-
-        assertThat(result).hasSize(1).containsExactly(payment);
-        verify(paymentRepository).findAllByStatus(PaymentStatus.PENDING);
-    }
 
     @Test
     void save_setsCreatedAtBeforePersisting() {

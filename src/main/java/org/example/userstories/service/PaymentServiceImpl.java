@@ -51,7 +51,7 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public Payment updatePaymentDetails(UUID id, PaymentUpdateRequest details) {
         Payment paymentById = findById(id);
-        paymentById = paymentMapper.toEntity(details);
+        paymentMapper.toEntity(details, paymentById);
         return paymentRepository.save(paymentById);
     }
 

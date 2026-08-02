@@ -47,8 +47,6 @@ class PaymentControllerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
-    @Autowired
-    private PaymentController paymentController;
 
 
     @Test
@@ -223,6 +221,24 @@ class PaymentControllerTest {
                 .andExpect(jsonPath("$.accountId").value("ACC-002"))
                 .andExpect(jsonPath("$.toIban").value("DE89370400440532013001"))
                 .andExpect(jsonPath("$.status").value("APPROVED"));
+    }
+
+    @Test
+    void updatePaymentDetails_returnsNotFound() throws Exception {
+        UUID id = UUID.randomUUID();
+        PaymentUpdateRequest request = new PaymentUpdateRequest(
+                200.0, "USD", "ACC-002",
+                "DE89370400440532013001"
+        );
+
+        when(paymentService.updatePaymentDetails(
+                any(UUID.class), any(PaymentUpdateRequest.class)))
+                .thenThrow(new PaymentNotFoundException(id));
+
+        mockMvc.perform(put("/api/v1/payments/{id}", id)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isNotFound());
     }
 
     @Test

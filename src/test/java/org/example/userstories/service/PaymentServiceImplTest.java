@@ -68,21 +68,16 @@ class PaymentServiceImplTest {
     @Test
     void update_setsAllFieldsAfterMapping() {
         UUID uuid = UUID.randomUUID();
-        Payment payment = new Payment(uuid, 200.0, "USD", "ACC-002",
-                "DE89370400440532013001", PaymentStatus.PENDING, LocalDateTime.now());
+        Payment payment = new Payment();
         PaymentUpdateRequest paymentUpdateRequest = new PaymentUpdateRequest(
                 200.0, "USD", "ACC-002",
                 "DE89370400440532013001");
         when(paymentRepository.findById(uuid)).thenReturn(Optional.of(payment));
-        when(paymentMapper.toEntity(paymentUpdateRequest)).thenReturn(payment);
         when(paymentRepository.save(payment)).thenReturn(payment);
 
-        Payment updated = paymentService.updatePaymentDetails(uuid, paymentUpdateRequest);
+        paymentService.updatePaymentDetails(uuid, paymentUpdateRequest);
 
+        verify(paymentMapper).toEntity(paymentUpdateRequest, payment);
         verify(paymentRepository).save(payment);
-        assertThat(updated.getAmount()).isEqualTo(200.0);
-        assertThat(updated.getCurrency()).isEqualTo("USD");
-        assertThat(updated.getAccountId()).isEqualTo("ACC-002");
-        assertThat(updated.getToIban()).isEqualTo("DE89370400440532013001");
     }
 }

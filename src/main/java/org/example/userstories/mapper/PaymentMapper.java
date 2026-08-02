@@ -6,6 +6,7 @@ import org.example.userstories.model.PaymentResponse;
 import org.example.userstories.model.PaymentUpdateRequest;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring")
 public interface PaymentMapper {
@@ -20,5 +21,5 @@ public interface PaymentMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "status", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
-    Payment toEntity(PaymentUpdateRequest request);
+    Payment toEntity(PaymentUpdateRequest request, @MappingTarget Payment payment);
 }

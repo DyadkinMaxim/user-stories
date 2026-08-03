@@ -2,15 +2,15 @@ package org.example.userstories.service;
 
 import org.example.userstories.model.Payment;
 import org.example.userstories.model.PaymentStatus;
-import org.example.userstories.model.PaymentUpdateRequest;
+import org.example.userstories.dto.PaymentUpdateRequest;
+import org.springframework.data.domain.Page;
 
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 public interface PaymentService {
 
-    List<Payment> findAll(PaymentStatus status, Double minAmount, Double maxAmount);
+    Page<Payment> findAll(PaymentStatus status, Double minAmount, Double maxAmount, int pageNumber, int size);
 
     Payment findById(UUID id);
 

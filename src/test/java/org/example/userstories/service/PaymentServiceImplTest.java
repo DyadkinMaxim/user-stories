@@ -3,7 +3,7 @@ package org.example.userstories.service;
 import jakarta.persistence.EntityManager;
 import org.example.userstories.mapper.PaymentMapper;
 import org.example.userstories.model.Payment;
-import org.example.userstories.model.PaymentUpdateRequest;
+import org.example.userstories.dto.PaymentUpdateRequest;
 import org.example.userstories.repository.PaymentRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

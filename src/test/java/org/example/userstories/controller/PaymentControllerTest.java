@@ -1,17 +1,18 @@
 package org.example.userstories.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.example.userstories.dto.PaymentRequest;
+import org.example.userstories.dto.PaymentResponse;
+import org.example.userstories.dto.PaymentUpdateRequest;
 import org.example.userstories.exception.PaymentNotFoundException;
 import org.example.userstories.mapper.PaymentMapper;
 import org.example.userstories.model.Payment;
-import org.example.userstories.model.PaymentRequest;
-import org.example.userstories.model.PaymentResponse;
 import org.example.userstories.model.PaymentStatus;
-import org.example.userstories.model.PaymentUpdateRequest;
 import org.example.userstories.service.PaymentService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -58,25 +59,30 @@ class PaymentControllerTest {
                 "DE89370400440532013000", PaymentStatus.PENDING, LocalDateTime.now()
         );
 
-        when(paymentService.findAll(null, null, null)).thenReturn(List.of(payment));
+        when(paymentService.findAll(null, null, null, 0 ,10))
+                .thenReturn(new PageImpl<>(List.of(payment)));
         when(paymentMapper.toResponse(payment)).thenReturn(response);
 
-        mockMvc.perform(get("/api/v1/payments"))
+        mockMvc.perform(get("/api/v1/payments")
+                        .param("pageNumber", "0")
+                        .param("size", "10"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].amount").value(150.0))
-                .andExpect(jsonPath("$[0].currency").value("EUR"))
-                .andExpect(jsonPath("$[0].status").value("PENDING"));
+                .andExpect(jsonPath("$.content.[0].amount").value(150.0))
+                .andExpect(jsonPath("$.content[0].currency").value("EUR"))
+                .andExpect(jsonPath("$.content[0].status").value("PENDING"));
     }
 
     @Test
     void findAll_returnsEmptyListWhenNoPayments()
             throws Exception {
-        when(paymentService.findAll(null, null, null))
-                .thenReturn(List.of());
+        when(paymentService.findAll(null, null, null, 0 , 10))
+                .thenReturn(new PageImpl<>(List.of()));
 
-        mockMvc.perform(get("/api/v1/payments"))
+        mockMvc.perform(get("/api/v1/payments")
+                        .param("pageNumber", "0")
+                        .param("size", "10"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isEmpty());
+                .andExpect(jsonPath("$.content").isEmpty());
     }
 
     @Test
@@ -88,15 +94,18 @@ class PaymentControllerTest {
                 "DE89370400440532013000", PaymentStatus.APPROVED, LocalDateTime.now()
         );
 
-        when(paymentService.findAll(PaymentStatus.APPROVED, null , null)).thenReturn(List.of(payment));
+        when(paymentService.findAll(PaymentStatus.APPROVED, null , null, 0 , 10))
+                .thenReturn(new PageImpl<>(List.of(payment)));
         when(paymentMapper.toResponse(payment)).thenReturn(response);
 
         mockMvc.perform(get("/api/v1/payments")
-                        .param("status", "APPROVED"))
+                        .param("status", "APPROVED")
+                        .param("pageNumber", "0")
+                        .param("size", "10"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].amount").value(150.0))
-                .andExpect(jsonPath("$[0].currency").value("EUR"))
-                .andExpect(jsonPath("$[0].status").value("APPROVED"));
+                .andExpect(jsonPath("$.content.[0].amount").value(150.0))
+                .andExpect(jsonPath("$.content.[0].currency").value("EUR"))
+                .andExpect(jsonPath("$.content.[0].status").value("APPROVED"));
     }
 
     @Test
@@ -104,9 +113,12 @@ class PaymentControllerTest {
             throws Exception {
         Payment payment = new Payment();
 
-        when(paymentService.findAll(PaymentStatus.APPROVED, null, null)).thenReturn(List.of(payment));
+        when(paymentService.findAll(PaymentStatus.APPROVED, null, null, 0 ,10))
+                .thenReturn(new PageImpl<>(List.of(payment)));
 
         mockMvc.perform(get("/api/v1/payments")
+                        .param("pageNumber", "0")
+                        .param("size", "10")
                         .param("status", "APPROVED11"))
                 .andExpect(status().isBadRequest());
     }
@@ -116,7 +128,8 @@ class PaymentControllerTest {
             throws Exception {
         Payment payment = new Payment();
 
-        when(paymentService.findAll(PaymentStatus.APPROVED, 100.0, 200.0)).thenReturn(List.of(payment));
+        when(paymentService.findAll(PaymentStatus.APPROVED, 100.0, 200.0, 0, 10))
+                .thenReturn(new PageImpl<>(List.of(payment)));
         when(paymentMapper.toResponse(payment)).thenReturn(
                 new PaymentResponse(UUID.randomUUID(), 150.0, "EUR", "1234",
                         "AB12", PaymentStatus.APPROVED, LocalDateTime.now()));
@@ -125,9 +138,11 @@ class PaymentControllerTest {
         mockMvc.perform(get("/api/v1/payments")
                         .param("status", "APPROVED")
                         .param("minAmount", "100.0")
-                        .param("maxAmount", "200.0"))
+                        .param("maxAmount", "200.0")
+                        .param("pageNumber", "0")
+                        .param("size", "10"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].amount").value(150.0));
+                .andExpect(jsonPath("$.content.[0].amount").value(150.0));
     }
 
     @Test
@@ -135,16 +150,19 @@ class PaymentControllerTest {
             throws Exception {
         Payment payment = new Payment();
 
-        when(paymentService.findAll(PaymentStatus.APPROVED, 100.0, null)).thenReturn(List.of(payment));
+        when(paymentService.findAll(PaymentStatus.APPROVED, 100.0, null, 0 ,10))
+                .thenReturn(new PageImpl<>(List.of(payment)));
         when(paymentMapper.toResponse(payment)).thenReturn(
                 new PaymentResponse(UUID.randomUUID(), 150.0, "EUR", "1234",
                         "AB12", PaymentStatus.APPROVED, LocalDateTime.now()));
 
         mockMvc.perform(get("/api/v1/payments")
                         .param("status", "APPROVED")
-                        .param("minAmount", "100.0"))
+                        .param("minAmount", "100.0")
+                        .param("pageNumber", "0")
+                        .param("size", "10"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].amount").value(150.0));
+                .andExpect(jsonPath("$.content.[0].amount").value(150.0));
     }
 
     @Test
@@ -152,16 +170,19 @@ class PaymentControllerTest {
             throws Exception {
         Payment payment = new Payment();
 
-        when(paymentService.findAll(null, 100.0, 200.0)).thenReturn(List.of(payment));
+        when(paymentService.findAll(null, 100.0, 200.0, 0 ,10))
+                .thenReturn(new PageImpl<>(List.of(payment)));
         when(paymentMapper.toResponse(payment)).thenReturn(
                 new PaymentResponse(UUID.randomUUID(), 150.0, "EUR", "1234",
                         "AB12", PaymentStatus.APPROVED, LocalDateTime.now()));
 
         mockMvc.perform(get("/api/v1/payments")
                         .param("minAmount", "100.0")
-                        .param("maxAmount", "200.0"))
+                        .param("maxAmount", "200.0")
+                        .param("pageNumber", "0")
+                        .param("size", "10"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].amount").value(150.0));
+                .andExpect(jsonPath("$.content.[0].amount").value(150.0));
     }
 
     @Test
@@ -169,16 +190,19 @@ class PaymentControllerTest {
             throws Exception {
         Payment payment = new Payment();
 
-        when(paymentService.findAll(PaymentStatus.APPROVED, null, 200.0)).thenReturn(List.of(payment));
+        when(paymentService.findAll(PaymentStatus.APPROVED, null, 200.0, 0 ,10))
+                .thenReturn(new PageImpl<>(List.of(payment)));
         when(paymentMapper.toResponse(payment)).thenReturn(
                 new PaymentResponse(UUID.randomUUID(), 150.0, "EUR", "1234",
                         "AB12", PaymentStatus.APPROVED, LocalDateTime.now()));
 
         mockMvc.perform(get("/api/v1/payments")
                         .param("status", "APPROVED")
-                        .param("maxAmount", "200.0"))
+                        .param("maxAmount", "200.0")
+                        .param("pageNumber", "0")
+                        .param("size", "10"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].amount").value(150.0));
+                .andExpect(jsonPath("$.content.[0].amount").value(150.0));
     }
 
     @Test
@@ -350,9 +374,9 @@ class PaymentControllerTest {
 
     @Test
     void getStats_returnsOkWithMap() throws Exception {
-        Map<PaymentStatus, Integer> paymentsByStatus = new HashMap<>();
-        paymentsByStatus.put(PaymentStatus.PENDING, 1);
-        paymentsByStatus.put(PaymentStatus.APPROVED, 2);
+        Map<PaymentStatus, Long> paymentsByStatus = new HashMap<>();
+        paymentsByStatus.put(PaymentStatus.PENDING, 1L);
+        paymentsByStatus.put(PaymentStatus.APPROVED, 2L);
 
         when(paymentService.getStats()).thenReturn(paymentsByStatus);
 

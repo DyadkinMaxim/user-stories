@@ -12,8 +12,13 @@ import org.example.userstories.mapper.PaymentMapper;
 import org.example.userstories.model.Payment;
 import org.example.userstories.repository.PaymentByStatus;
 import org.example.userstories.model.PaymentStatus;
-import org.example.userstories.model.PaymentUpdateRequest;
+import org.example.userstories.dto.PaymentUpdateRequest;
 import org.example.userstories.repository.PaymentRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,8 +37,9 @@ public class PaymentServiceImpl implements PaymentService {
     private final EntityManager entityManager;
 
     @Override
-    public List<Payment> findAll(final PaymentStatus status,
-                                 final Double minAmount, final Double maxAmount) {
+    public Page<Payment> findAll(final PaymentStatus status,
+                                       final Double minAmount, final Double maxAmount,
+                                       int pageNumber, int size) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Payment> cq = cb.createQuery(Payment.class);
 
@@ -41,8 +47,22 @@ public class PaymentServiceImpl implements PaymentService {
         List<Predicate> predicates = buildPredicates(status, minAmount, maxAmount, cb, root);
         cq.where(cb.and(predicates.toArray(new Predicate[0])));
 
+        Pageable pageable = PageRequest.of(pageNumber, size, Sort.by("id"));
         TypedQuery<Payment> query = entityManager.createQuery(cq);
-        return query.getResultList();
+        query.setFirstResult((int) pageable.getOffset());
+        query.setMaxResults(pageable.getPageSize());
+        List<Payment> content = query.getResultList();
+
+        CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
+        Root<Payment> countRoot = countQuery.from(Payment.class);
+        List<Predicate> countPredicates = buildPredicates(status, minAmount, maxAmount,
+                cb, countRoot);
+        countQuery.select(cb.count(countRoot))
+                .where(cb.and(countPredicates.toArray(new Predicate[0])));
+         Long total = entityManager.createQuery(countQuery).getSingleResult();
+
+
+        return new PageImpl<>(content, pageable, total);
     }
 
     private List<Predicate> buildPredicates(

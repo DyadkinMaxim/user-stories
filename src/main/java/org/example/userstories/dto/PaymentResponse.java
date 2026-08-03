@@ -1,4 +1,7 @@
-package org.example.userstories.model;
+package org.example.userstories.dto;
+
+import org.example.userstories.model.Payment;
+import org.example.userstories.model.PaymentStatus;
 
 import java.time.LocalDateTime;
 import java.util.UUID;

@@ -1,13 +1,15 @@
 package org.example.userstories.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.example.userstories.dto.PagedResponse;
 import org.example.userstories.mapper.PaymentMapper;
 import org.example.userstories.model.Payment;
-import org.example.userstories.model.PaymentRequest;
-import org.example.userstories.model.PaymentResponse;
+import org.example.userstories.dto.PaymentRequest;
+import org.example.userstories.dto.PaymentResponse;
 import org.example.userstories.model.PaymentStatus;
-import org.example.userstories.model.PaymentUpdateRequest;
+import org.example.userstories.dto.PaymentUpdateRequest;
 import org.example.userstories.service.PaymentService;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -34,13 +36,26 @@ public class PaymentController {
     private final PaymentMapper paymentMapper;
 
     @GetMapping
-    public ResponseEntity<List<PaymentResponse>> findAll(
+    public ResponseEntity<PagedResponse<PaymentResponse>> findAll(
             @RequestParam(required = false) PaymentStatus status,
             @RequestParam(required = false) Double minAmount,
-            @RequestParam(required = false) Double maxAmount) {
-        return ResponseEntity.ok(
-                paymentService.findAll(status, minAmount, maxAmount)
-                        .stream().map(paymentMapper::toResponse).toList());
+            @RequestParam(required = false) Double maxAmount,
+            @RequestParam int pageNumber,
+            @RequestParam int size
+            ) {
+
+        Page<Payment> page = paymentService.findAll(
+                status, minAmount, maxAmount, pageNumber, size);
+        PagedResponse<PaymentResponse> response =
+                new PagedResponse<>(
+                        page.stream().map(paymentMapper::toResponse).toList(),
+                        pageNumber,
+                        size,
+                        page.getTotalElements(),
+                        page.getTotalPages(),
+                        page.isLast()
+                );
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{id}")

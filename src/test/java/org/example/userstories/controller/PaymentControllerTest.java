@@ -13,9 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -55,9 +53,6 @@ class PaymentControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    private final static Pageable PAGEABLE = PageRequest.of(0, 10, Sort.by("id"));
-
-
     @Test
     void findAll_returnsOkWithPaymentList() throws Exception {
         Payment payment = new Payment();
@@ -77,7 +72,7 @@ class PaymentControllerTest {
                 .andExpect(jsonPath("$.content[0].currency").value("EUR"))
                 .andExpect(jsonPath("$.content[0].status").value("PENDING"))
                 .andExpect(jsonPath("$.totalPages").value(1))
-                .andExpect(jsonPath("$.page").value(0));;
+                .andExpect(jsonPath("$.page").value(0));
     }
 
     @Test
@@ -243,7 +238,7 @@ class PaymentControllerTest {
                         .value("Validation failed"))
                 .andExpect(jsonPath("$.detail")
                         .value(containsString("IBAN must start with 2 letters" +
-                                " followed by 2 digits followed by alphanumeric.")));;
+                                " followed by 2 digits followed by alphanumeric.")));
     }
 
     @Test
@@ -367,7 +362,7 @@ class PaymentControllerTest {
                         .value("Validation failed"))
                 .andExpect(jsonPath("$.detail")
                         .value(containsString("IBAN must start with 2 letters" +
-                                " followed by 2 digits followed by alphanumeric.")));;
+                                " followed by 2 digits followed by alphanumeric.")));
     }
 
     @Test

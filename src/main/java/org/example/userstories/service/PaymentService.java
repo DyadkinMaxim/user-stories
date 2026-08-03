@@ -24,5 +24,5 @@ public interface PaymentService {
 
     void softDelete(UUID id);
 
-    Map<PaymentStatus, Integer> getStats();
+    Map<PaymentStatus, Long> getStats();
 }

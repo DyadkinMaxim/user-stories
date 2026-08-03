@@ -10,7 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.userstories.exception.PaymentNotFoundException;
 import org.example.userstories.mapper.PaymentMapper;
 import org.example.userstories.model.Payment;
-import org.example.userstories.model.PaymentByStatus;
+import org.example.userstories.repository.PaymentByStatus;
 import org.example.userstories.model.PaymentStatus;
 import org.example.userstories.model.PaymentUpdateRequest;
 import org.example.userstories.repository.PaymentRepository;
@@ -113,7 +113,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public Map<PaymentStatus, Integer> getStats() {
+    public Map<PaymentStatus, Long> getStats() {
         return paymentRepository.countPaymentByStatus().stream()
                 .collect(Collectors.toMap(
                         PaymentByStatus::getStatus, PaymentByStatus::getCount));

@@ -82,7 +82,7 @@ public class PaymentController {
     }
 
     @GetMapping("/stats")
-    public ResponseEntity<Map<PaymentStatus, Integer>> getStats() {
+    public ResponseEntity<Map<PaymentStatus, Long>> getStats() {
         return ResponseEntity.ok(paymentService.getStats());
     }
 

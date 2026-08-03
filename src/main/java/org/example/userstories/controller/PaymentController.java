@@ -10,6 +10,9 @@ import org.example.userstories.model.PaymentStatus;
 import org.example.userstories.dto.PaymentUpdateRequest;
 import org.example.userstories.service.PaymentService;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -39,20 +42,21 @@ public class PaymentController {
             @RequestParam(required = false) PaymentStatus status,
             @RequestParam(required = false) Double minAmount,
             @RequestParam(required = false) Double maxAmount,
-            @RequestParam int pageNumber,
-            @RequestParam int size
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
             ) {
 
-        Page<Payment> page = paymentService.findAll(
-                status, minAmount, maxAmount, pageNumber, size);
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id"));
+        Page<Payment> allPayments = paymentService.findAll(
+                status, minAmount, maxAmount, pageable);
         PagedResponse<PaymentResponse> response =
                 new PagedResponse<>(
-                        page.stream().map(paymentMapper::toResponse).toList(),
-                        pageNumber,
+                        allPayments.stream().map(paymentMapper::toResponse).toList(),
+                        page,
                         size,
-                        page.getTotalElements(),
-                        page.getTotalPages(),
-                        page.isLast()
+                        allPayments.getTotalElements(),
+                        allPayments.getTotalPages(),
+                        allPayments.isLast()
                 );
         return ResponseEntity.ok(response);
     }

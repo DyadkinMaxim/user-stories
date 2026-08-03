@@ -13,6 +13,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -50,6 +53,8 @@ class PaymentControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    private final static Pageable PAGEABLE = PageRequest.of(0, 10, Sort.by("id"));
+
 
     @Test
     void findAll_returnsOkWithPaymentList() throws Exception {
@@ -59,28 +64,26 @@ class PaymentControllerTest {
                 "DE89370400440532013000", PaymentStatus.PENDING, LocalDateTime.now()
         );
 
-        when(paymentService.findAll(null, null, null, 0 ,10))
+        when(paymentService.findAll(null, null, null, PAGEABLE))
                 .thenReturn(new PageImpl<>(List.of(payment)));
         when(paymentMapper.toResponse(payment)).thenReturn(response);
 
-        mockMvc.perform(get("/api/v1/payments")
-                        .param("pageNumber", "0")
-                        .param("size", "10"))
+        mockMvc.perform(get("/api/v1/payments"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content.[0].amount").value(150.0))
+                .andExpect(jsonPath("$.content[0].amount").value(150.0))
                 .andExpect(jsonPath("$.content[0].currency").value("EUR"))
-                .andExpect(jsonPath("$.content[0].status").value("PENDING"));
+                .andExpect(jsonPath("$.content[0].status").value("PENDING"))
+                .andExpect(jsonPath("$.totalPages").value(1))
+                .andExpect(jsonPath("$.page").value(0));;
     }
 
     @Test
     void findAll_returnsEmptyListWhenNoPayments()
             throws Exception {
-        when(paymentService.findAll(null, null, null, 0 , 10))
+        when(paymentService.findAll(null, null, null, PAGEABLE))
                 .thenReturn(new PageImpl<>(List.of()));
 
-        mockMvc.perform(get("/api/v1/payments")
-                        .param("pageNumber", "0")
-                        .param("size", "10"))
+        mockMvc.perform(get("/api/v1/payments"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").isEmpty());
     }
@@ -94,18 +97,16 @@ class PaymentControllerTest {
                 "DE89370400440532013000", PaymentStatus.APPROVED, LocalDateTime.now()
         );
 
-        when(paymentService.findAll(PaymentStatus.APPROVED, null , null, 0 , 10))
+        when(paymentService.findAll(PaymentStatus.APPROVED, null , null, PAGEABLE))
                 .thenReturn(new PageImpl<>(List.of(payment)));
         when(paymentMapper.toResponse(payment)).thenReturn(response);
 
         mockMvc.perform(get("/api/v1/payments")
-                        .param("status", "APPROVED")
-                        .param("pageNumber", "0")
-                        .param("size", "10"))
+                        .param("status", "APPROVED"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content.[0].amount").value(150.0))
-                .andExpect(jsonPath("$.content.[0].currency").value("EUR"))
-                .andExpect(jsonPath("$.content.[0].status").value("APPROVED"));
+                .andExpect(jsonPath("$.content[0].amount").value(150.0))
+                .andExpect(jsonPath("$.content[0].currency").value("EUR"))
+                .andExpect(jsonPath("$.content[0].status").value("APPROVED"));
     }
 
     @Test
@@ -113,12 +114,10 @@ class PaymentControllerTest {
             throws Exception {
         Payment payment = new Payment();
 
-        when(paymentService.findAll(PaymentStatus.APPROVED, null, null, 0 ,10))
+        when(paymentService.findAll(PaymentStatus.APPROVED, null, null, PAGEABLE))
                 .thenReturn(new PageImpl<>(List.of(payment)));
 
         mockMvc.perform(get("/api/v1/payments")
-                        .param("pageNumber", "0")
-                        .param("size", "10")
                         .param("status", "APPROVED11"))
                 .andExpect(status().isBadRequest());
     }
@@ -128,7 +127,7 @@ class PaymentControllerTest {
             throws Exception {
         Payment payment = new Payment();
 
-        when(paymentService.findAll(PaymentStatus.APPROVED, 100.0, 200.0, 0, 10))
+        when(paymentService.findAll(PaymentStatus.APPROVED, 100.0, 200.0, PAGEABLE))
                 .thenReturn(new PageImpl<>(List.of(payment)));
         when(paymentMapper.toResponse(payment)).thenReturn(
                 new PaymentResponse(UUID.randomUUID(), 150.0, "EUR", "1234",
@@ -138,11 +137,9 @@ class PaymentControllerTest {
         mockMvc.perform(get("/api/v1/payments")
                         .param("status", "APPROVED")
                         .param("minAmount", "100.0")
-                        .param("maxAmount", "200.0")
-                        .param("pageNumber", "0")
-                        .param("size", "10"))
+                        .param("maxAmount", "200.0"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content.[0].amount").value(150.0));
+                .andExpect(jsonPath("$.content[0].amount").value(150.0));
     }
 
     @Test
@@ -150,7 +147,7 @@ class PaymentControllerTest {
             throws Exception {
         Payment payment = new Payment();
 
-        when(paymentService.findAll(PaymentStatus.APPROVED, 100.0, null, 0 ,10))
+        when(paymentService.findAll(PaymentStatus.APPROVED, 100.0, null, PAGEABLE))
                 .thenReturn(new PageImpl<>(List.of(payment)));
         when(paymentMapper.toResponse(payment)).thenReturn(
                 new PaymentResponse(UUID.randomUUID(), 150.0, "EUR", "1234",
@@ -158,11 +155,9 @@ class PaymentControllerTest {
 
         mockMvc.perform(get("/api/v1/payments")
                         .param("status", "APPROVED")
-                        .param("minAmount", "100.0")
-                        .param("pageNumber", "0")
-                        .param("size", "10"))
+                        .param("minAmount", "100.0"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content.[0].amount").value(150.0));
+                .andExpect(jsonPath("$.content[0].amount").value(150.0));
     }
 
     @Test
@@ -170,7 +165,7 @@ class PaymentControllerTest {
             throws Exception {
         Payment payment = new Payment();
 
-        when(paymentService.findAll(null, 100.0, 200.0, 0 ,10))
+        when(paymentService.findAll(null, 100.0, 200.0, PAGEABLE))
                 .thenReturn(new PageImpl<>(List.of(payment)));
         when(paymentMapper.toResponse(payment)).thenReturn(
                 new PaymentResponse(UUID.randomUUID(), 150.0, "EUR", "1234",
@@ -178,11 +173,9 @@ class PaymentControllerTest {
 
         mockMvc.perform(get("/api/v1/payments")
                         .param("minAmount", "100.0")
-                        .param("maxAmount", "200.0")
-                        .param("pageNumber", "0")
-                        .param("size", "10"))
+                        .param("maxAmount", "200.0"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content.[0].amount").value(150.0));
+                .andExpect(jsonPath("$.content[0].amount").value(150.0));
     }
 
     @Test
@@ -190,7 +183,7 @@ class PaymentControllerTest {
             throws Exception {
         Payment payment = new Payment();
 
-        when(paymentService.findAll(PaymentStatus.APPROVED, null, 200.0, 0 ,10))
+        when(paymentService.findAll(PaymentStatus.APPROVED, null, 200.0, PAGEABLE))
                 .thenReturn(new PageImpl<>(List.of(payment)));
         when(paymentMapper.toResponse(payment)).thenReturn(
                 new PaymentResponse(UUID.randomUUID(), 150.0, "EUR", "1234",
@@ -198,11 +191,9 @@ class PaymentControllerTest {
 
         mockMvc.perform(get("/api/v1/payments")
                         .param("status", "APPROVED")
-                        .param("maxAmount", "200.0")
-                        .param("pageNumber", "0")
-                        .param("size", "10"))
+                        .param("maxAmount", "200.0"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content.[0].amount").value(150.0));
+                .andExpect(jsonPath("$.content[0].amount").value(150.0));
     }
 
     @Test

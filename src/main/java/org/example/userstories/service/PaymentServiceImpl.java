@@ -39,7 +39,7 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public Page<Payment> findAll(final PaymentStatus status,
                                        final Double minAmount, final Double maxAmount,
-                                       int pageNumber, int size) {
+                                       Pageable pageable) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Payment> cq = cb.createQuery(Payment.class);
 
@@ -47,7 +47,6 @@ public class PaymentServiceImpl implements PaymentService {
         List<Predicate> predicates = buildPredicates(status, minAmount, maxAmount, cb, root);
         cq.where(cb.and(predicates.toArray(new Predicate[0])));
 
-        Pageable pageable = PageRequest.of(pageNumber, size, Sort.by("id"));
         TypedQuery<Payment> query = entityManager.createQuery(cq);
         query.setFirstResult((int) pageable.getOffset());
         query.setMaxResults(pageable.getPageSize());

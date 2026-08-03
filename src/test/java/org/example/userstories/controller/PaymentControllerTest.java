@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
@@ -237,7 +238,12 @@ class PaymentControllerTest {
         mockMvc.perform(post("/api/v1/payments")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.title")
+                        .value("Validation failed"))
+                .andExpect(jsonPath("$.detail")
+                        .value(containsString("IBAN must start with 2 letters" +
+                                " followed by 2 digits followed by alphanumeric.")));;
     }
 
     @Test
@@ -350,13 +356,18 @@ class PaymentControllerTest {
     @Test
     void updatePaymentDetails_invalidIban() throws Exception {
         UUID id = UUID.randomUUID();
-        PaymentRequest request = new PaymentRequest(200.0, "USD",
+        PaymentUpdateRequest request = new PaymentUpdateRequest(200.0, "USD",
                 "ACC-002", "F1R7630006000011234567890189");
 
         mockMvc.perform(put("/api/v1/payments/{id}", id)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.title")
+                        .value("Validation failed"))
+                .andExpect(jsonPath("$.detail")
+                        .value(containsString("IBAN must start with 2 letters" +
+                                " followed by 2 digits followed by alphanumeric.")));;
     }
 
     @Test

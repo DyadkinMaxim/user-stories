@@ -5,6 +5,7 @@ import org.example.userstories.model.PaymentStatus;
 import org.example.userstories.model.PaymentUpdateRequest;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public interface PaymentService {
@@ -22,4 +23,6 @@ public interface PaymentService {
     void hardDelete(UUID id);
 
     void softDelete(UUID id);
+
+    Map<PaymentStatus, Integer> getStats();
 }

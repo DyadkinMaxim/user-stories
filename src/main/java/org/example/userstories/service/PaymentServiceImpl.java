@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.userstories.exception.PaymentNotFoundException;
 import org.example.userstories.mapper.PaymentMapper;
 import org.example.userstories.model.Payment;
+import org.example.userstories.model.PaymentByStatus;
 import org.example.userstories.model.PaymentStatus;
 import org.example.userstories.model.PaymentUpdateRequest;
 import org.example.userstories.repository.PaymentRepository;
@@ -18,7 +19,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -107,5 +110,12 @@ public class PaymentServiceImpl implements PaymentService {
     @Transactional
     public void softDelete(UUID id) {
         updateStatus(id, PaymentStatus.CANCELLED);
+    }
+
+    @Override
+    public Map<PaymentStatus, Integer> getStats() {
+        return paymentRepository.countPaymentByStatus().stream()
+                .collect(Collectors.toMap(
+                        PaymentByStatus::getStatus, PaymentByStatus::getCount));
     }
 }

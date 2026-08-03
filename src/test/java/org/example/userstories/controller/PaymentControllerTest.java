@@ -17,7 +17,9 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -344,5 +346,19 @@ class PaymentControllerTest {
 
         mockMvc.perform(delete("/api/v1/payments/hard/{id}", id))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void getStats_returnsOkWithMap() throws Exception {
+        Map<PaymentStatus, Integer> paymentsByStatus = new HashMap<>();
+        paymentsByStatus.put(PaymentStatus.PENDING, 1);
+        paymentsByStatus.put(PaymentStatus.APPROVED, 2);
+
+        when(paymentService.getStats()).thenReturn(paymentsByStatus);
+
+        mockMvc.perform(get("/api/v1/payments/stats"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.PENDING").value(1))
+                .andExpect(jsonPath("$.APPROVED").value(2));
     }
 }

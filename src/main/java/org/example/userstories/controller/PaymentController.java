@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -36,34 +37,26 @@ public class PaymentController {
     public ResponseEntity<List<PaymentResponse>> findAll(
             @RequestParam(required = false) PaymentStatus status,
             @RequestParam(required = false) Double minAmount,
-            @RequestParam(required = false) Double maxAmount
-    ) {
+            @RequestParam(required = false) Double maxAmount) {
         return ResponseEntity.ok(
-                paymentService.findAll(status, minAmount, maxAmount).stream()
-                        .map(paymentMapper::toResponse)
-                        .toList()
-                );
+                paymentService.findAll(status, minAmount, maxAmount)
+                        .stream().map(paymentMapper::toResponse).toList());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<PaymentResponse> findById(@PathVariable final UUID id) {
-        return ResponseEntity.ok(
-                paymentMapper.toResponse(
-                        paymentService.findById(id))
-                );
+        return ResponseEntity.ok(paymentMapper.toResponse(paymentService.findById(id)));
     }
 
     @PostMapping
     public ResponseEntity<PaymentResponse> create(@RequestBody PaymentRequest request) {
         Payment saved = paymentService.save(paymentMapper.toEntity(request));
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(paymentMapper.toResponse(saved));
+        return ResponseEntity.status(HttpStatus.CREATED).body(paymentMapper.toResponse(saved));
     }
 
     @PatchMapping("/{id}/status")
     public ResponseEntity<PaymentResponse> updateStatus(
-            @PathVariable UUID id,
-            @RequestParam PaymentStatus status) {
+            @PathVariable UUID id, @RequestParam PaymentStatus status) {
         Payment updated = paymentService.updateStatus(id, status);
         return ResponseEntity.ok(paymentMapper.toResponse(updated));
     }
@@ -86,6 +79,11 @@ public class PaymentController {
     public ResponseEntity<Void> deletePaymentSoft(@PathVariable UUID id) {
         paymentService.softDelete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/stats")
+    public ResponseEntity<Map<PaymentStatus, Integer>> getStats() {
+        return ResponseEntity.ok(paymentService.getStats());
     }
 
 }

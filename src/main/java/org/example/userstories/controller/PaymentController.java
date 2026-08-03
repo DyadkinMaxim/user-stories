@@ -1,5 +1,6 @@
 package org.example.userstories.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.userstories.dto.PagedResponse;
 import org.example.userstories.mapper.PaymentMapper;
@@ -67,7 +68,7 @@ public class PaymentController {
     }
 
     @PostMapping
-    public ResponseEntity<PaymentResponse> create(@RequestBody PaymentRequest request) {
+    public ResponseEntity<PaymentResponse> create(@RequestBody @Valid PaymentRequest request) {
         Payment saved = paymentService.save(paymentMapper.toEntity(request));
         return ResponseEntity.status(HttpStatus.CREATED).body(paymentMapper.toResponse(saved));
     }
@@ -82,7 +83,7 @@ public class PaymentController {
     @PutMapping("/{id}")
     public ResponseEntity<PaymentResponse> updatePaymentDetails(
             @PathVariable UUID id,
-            @RequestBody PaymentUpdateRequest paymentUpdateRequest) {
+            @RequestBody @Valid PaymentUpdateRequest paymentUpdateRequest) {
         Payment updated = paymentService.updatePaymentDetails(id, paymentUpdateRequest);
         return ResponseEntity.ok(paymentMapper.toResponse(updated));
     }

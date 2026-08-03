@@ -230,6 +230,17 @@ class PaymentControllerTest {
     }
 
     @Test
+    void create_returns400_invalidIban() throws Exception {
+        PaymentRequest request = new PaymentRequest(200.0, "USD",
+                "ACC-002", "F1R7630006000011234567890189");
+
+        mockMvc.perform(post("/api/v1/payments")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     void findById_returnsOkWithPayment() throws Exception {
         Payment payment = new Payment();
         UUID id = UUID.randomUUID();
@@ -334,6 +345,18 @@ class PaymentControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void updatePaymentDetails_invalidIban() throws Exception {
+        UUID id = UUID.randomUUID();
+        PaymentRequest request = new PaymentRequest(200.0, "USD",
+                "ACC-002", "F1R7630006000011234567890189");
+
+        mockMvc.perform(put("/api/v1/payments/{id}", id)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest());
     }
 
     @Test

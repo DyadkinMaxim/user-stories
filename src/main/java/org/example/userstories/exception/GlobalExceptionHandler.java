@@ -4,10 +4,13 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -27,9 +30,26 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ProblemDetail> handleInvalidArgument(MethodArgumentTypeMismatchException ex) {
         ProblemDetail problemDetail =
                 ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
-        problemDetail.setTitle("Invalid argument");
+        problemDetail.setTitle("Invalid argument type");
         problemDetail.setDetail(ex.getMessage());
         return ResponseEntity.status(400).body(problemDetail);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<ProblemDetail> handleInvalidArgument(MethodArgumentNotValidException ex) {
+        String message = ex.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .map(f -> f.getField() + ": "
+                        + f.getDefaultMessage())
+                .collect(Collectors.joining(", "));
+
+        ProblemDetail problem =
+                ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
+        problem.setTitle("Validation failed");
+        problem.setDetail(message);
+        return ResponseEntity.status(400).body(problem);
     }
 
     @ExceptionHandler(IllegalStateException.class)

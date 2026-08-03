@@ -30,8 +30,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ProblemDetail> handleInvalidArgument(MethodArgumentTypeMismatchException ex) {
         ProblemDetail problemDetail =
                 ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
-        problemDetail.setTitle("Invalid argument type");
-        problemDetail.setDetail(ex.getMessage());
+        problemDetail.setTitle("Invalid argument");
+        problemDetail.setDetail(String.format("Invalid argument: %s", ex.getName()));
         return ResponseEntity.status(400).body(problemDetail);
     }
 

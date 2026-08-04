@@ -1,5 +1,6 @@
 package org.example.userstories.controller;
 
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.userstories.dto.PagedResponse;
@@ -29,6 +30,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Map;
 import java.util.UUID;
 
@@ -110,6 +113,29 @@ public class PaymentController {
     @GetMapping("/stats")
     public ResponseEntity<Map<PaymentStatus, Long>> getStats() {
         return ResponseEntity.ok(paymentService.getStats());
+    }
+
+    @GetMapping("/export")
+    public void export(HttpServletResponse response) throws IOException {
+        response.setContentType("text/csv");
+        response.setHeader("Content-Disposition", "attachment; filename=payments.csv");
+
+        PrintWriter writer = response.getWriter();
+        writer.println("id, amount, currency, accountId, toIban, status, createdAt");
+
+        paymentService.findAllForExport().forEach(payment ->
+                writer.println(String.join(",",
+                        payment.getId().toString(),
+                        payment.getAmount().toString(),
+                        payment.getCurrency(),
+                        payment.getAccountId(),
+                        payment.getToIban(),
+                        payment.getStatus().toString(),
+                        payment.getCreatedAt().toString()
+                ))
+        );
+
+        writer.flush();
     }
 
 }

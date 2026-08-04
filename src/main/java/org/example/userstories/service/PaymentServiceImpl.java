@@ -143,4 +143,9 @@ public class PaymentServiceImpl implements PaymentService {
                 .collect(Collectors.toMap(
                         PaymentByStatus::getStatus, PaymentByStatus::getCount));
     }
+
+    @Override
+    public List<Payment> findAllForExport() {
+        return paymentRepository.findAll();
+    }
 }

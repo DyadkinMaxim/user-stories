@@ -36,6 +36,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -437,5 +439,28 @@ class PaymentControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.PENDING").value(1))
                 .andExpect(jsonPath("$.APPROVED").value(2));
+    }
+
+    @Test
+    void export_returnsAllPaymentsWith200() throws Exception {
+        Payment payment = new Payment();
+        payment.setId(UUID.randomUUID());
+        payment.setAmount(150.0);
+        payment.setCurrency("EUR");
+        payment.setAccountId("ACC-001");
+        payment.setToIban("DE89370400440532013000");
+        payment.setStatus(PaymentStatus.PENDING);
+        payment.setCreatedAt(LocalDateTime.now());
+
+        when(paymentService.findAllForExport()).thenReturn(List.of(payment));
+
+        mockMvc.perform(get("/api/v1/payments/export"))
+                .andExpect(status().isOk())
+                .andExpect(header().string("Content-Type",
+                        containsString("text/csv")))
+                .andExpect(header().string("Content-Disposition",
+                        containsString("attachment; filename=payments.csv")))
+                .andExpect(content().string(containsString("id, amount, currency, accountId,")))
+                .andExpect(content().string(containsString("DE89370400440532013000")));
     }
 }

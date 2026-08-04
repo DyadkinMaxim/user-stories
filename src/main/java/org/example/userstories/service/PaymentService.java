@@ -7,6 +7,7 @@ import org.example.userstories.dto.PaymentUpdateRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -27,4 +28,6 @@ public interface PaymentService {
     void softDelete(UUID id);
 
     Map<PaymentStatus, Long> getStats();
+
+    List<Payment> findAllForExport();
 }

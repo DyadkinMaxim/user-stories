@@ -460,7 +460,7 @@ class PaymentControllerTest {
                         containsString("text/csv")))
                 .andExpect(header().string("Content-Disposition",
                         containsString("attachment; filename=payments.csv")))
-                .andExpect(content().string(containsString("id, amount, currency, accountId,")))
+                .andExpect(content().string(containsString("id,amount,currency,accountId,")))
                 .andExpect(content().string(containsString("DE89370400440532013000")));
     }
 }

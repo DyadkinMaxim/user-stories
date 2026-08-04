@@ -244,7 +244,7 @@ class PaymentControllerTest {
     }
 
     @Test
-    void create_returns409_duplicatedIdempotency() throws Exception {
+    void create_returns200_duplicatedIdempotency() throws Exception {
         PaymentRequest request = new PaymentRequest(200.0, "USD", "ACC-002", "FR7630006000011234567890189");
         Payment entity = new Payment();
         Payment saved = new Payment();
@@ -253,8 +253,8 @@ class PaymentControllerTest {
                 "FR7630006000011234567890189", PaymentStatus.PENDING, LocalDateTime.now()
         );
 
-        when(paymentMapper.toEntity(request)).thenReturn(entity);
-        when(paymentService.save(entity, "1"))
+        when(paymentMapper.toEntity(any())).thenReturn(entity);
+        when(paymentService.save(any(), eq("1")))
                 .thenReturn(new SavePayment(saved, true));
         when(paymentMapper.toResponse(saved)).thenReturn(response);
 

@@ -3,6 +3,7 @@ package org.example.userstories.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.userstories.dto.PagedResponse;
+import org.example.userstories.dto.SavePayment;
 import org.example.userstories.mapper.PaymentMapper;
 import org.example.userstories.model.Payment;
 import org.example.userstories.dto.PaymentRequest;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -68,9 +70,14 @@ public class PaymentController {
     }
 
     @PostMapping
-    public ResponseEntity<PaymentResponse> create(@RequestBody @Valid PaymentRequest request) {
-        Payment saved = paymentService.save(paymentMapper.toEntity(request));
-        return ResponseEntity.status(HttpStatus.CREATED).body(paymentMapper.toResponse(saved));
+    public ResponseEntity<PaymentResponse> create(
+            @RequestBody @Valid PaymentRequest request,
+            @RequestHeader(value = "Idempotency-Key", required = false) String idempotencyKey) {
+        SavePayment saved = paymentService.save(paymentMapper.toEntity(request), idempotencyKey);
+        return ResponseEntity.status(
+                saved.isDuplicate() ? HttpStatus.OK : HttpStatus.CREATED)
+                .body(paymentMapper.toResponse(saved.payment())
+                );
     }
 
     @PatchMapping("/{id}/status")

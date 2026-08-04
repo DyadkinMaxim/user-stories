@@ -47,6 +47,9 @@ public class Payment {
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @Column(unique = true)
+    private String idempotencyKey;
+
     @PrePersist
     protected void onCreate() {
         if (status == null) status = PaymentStatus.PENDING;

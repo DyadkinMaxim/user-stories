@@ -1,5 +1,6 @@
 package org.example.userstories.service;
 
+import org.example.userstories.dto.SavePayment;
 import org.example.userstories.model.Payment;
 import org.example.userstories.model.PaymentStatus;
 import org.example.userstories.dto.PaymentUpdateRequest;
@@ -15,7 +16,7 @@ public interface PaymentService {
 
     Payment findById(UUID id);
 
-    Payment save(Payment payment);
+    SavePayment save(Payment payment, String idempotencyKey);
 
     Payment updateStatus(UUID id, PaymentStatus status);
 

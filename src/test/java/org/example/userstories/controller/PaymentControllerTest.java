@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.userstories.dto.PaymentRequest;
 import org.example.userstories.dto.PaymentResponse;
 import org.example.userstories.dto.PaymentUpdateRequest;
+import org.example.userstories.dto.SavePayment;
 import org.example.userstories.exception.PaymentNotFoundException;
 import org.example.userstories.mapper.PaymentMapper;
 import org.example.userstories.model.Payment;
@@ -212,7 +213,8 @@ class PaymentControllerTest {
         );
 
         when(paymentMapper.toEntity(request)).thenReturn(entity);
-        when(paymentService.save(entity)).thenReturn(saved);
+        when(paymentService.save(eq(entity), isNull()))
+                .thenReturn(new SavePayment(saved, false));
         when(paymentMapper.toResponse(saved)).thenReturn(response);
 
         mockMvc.perform(post("/api/v1/payments")
@@ -239,6 +241,28 @@ class PaymentControllerTest {
                 .andExpect(jsonPath("$.detail")
                         .value(containsString("IBAN must start with 2 letters" +
                                 " followed by 2 digits followed by alphanumeric.")));
+    }
+
+    @Test
+    void create_returns409_duplicatedIdempotency() throws Exception {
+        PaymentRequest request = new PaymentRequest(200.0, "USD", "ACC-002", "FR7630006000011234567890189");
+        Payment entity = new Payment();
+        Payment saved = new Payment();
+        PaymentResponse response = new PaymentResponse(
+                UUID.randomUUID(), 200.0, "USD", "ACC-002",
+                "FR7630006000011234567890189", PaymentStatus.PENDING, LocalDateTime.now()
+        );
+
+        when(paymentMapper.toEntity(request)).thenReturn(entity);
+        when(paymentService.save(entity, "1"))
+                .thenReturn(new SavePayment(saved, true));
+        when(paymentMapper.toResponse(saved)).thenReturn(response);
+
+        mockMvc.perform(post("/api/v1/payments")
+                        .header("Idempotency-Key", "1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk());
     }
 
     @Test

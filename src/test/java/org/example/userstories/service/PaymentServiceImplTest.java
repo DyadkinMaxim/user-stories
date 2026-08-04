@@ -37,7 +37,7 @@ class PaymentServiceImplTest {
         Payment payment = new Payment();
         when(paymentRepository.save(payment)).thenReturn(payment);
 
-        paymentService.save(payment);
+        paymentService.save(payment, "1");
 
         verify(paymentRepository).save(payment);
     }

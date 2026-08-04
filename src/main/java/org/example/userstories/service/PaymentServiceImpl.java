@@ -7,6 +7,7 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import lombok.RequiredArgsConstructor;
+import org.example.userstories.dto.SavePayment;
 import org.example.userstories.exception.PaymentNotFoundException;
 import org.example.userstories.mapper.PaymentMapper;
 import org.example.userstories.model.Payment;
@@ -23,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -90,8 +92,14 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Transactional
     @Override
-    public Payment save(Payment payment) {
-        return paymentRepository.save(payment);
+    public SavePayment save(Payment payment, final String idempotencyKey) {
+        Optional<Payment> paymentByIdempotencyKey = paymentRepository.findByIdempotencyKey(idempotencyKey);
+        if(paymentByIdempotencyKey.isPresent()) {
+            return new SavePayment(paymentByIdempotencyKey.get(), true);
+        } else {
+            payment.setIdempotencyKey(idempotencyKey);
+            return new SavePayment(paymentRepository.save(payment), false);
+        }
     }
 
     @Override

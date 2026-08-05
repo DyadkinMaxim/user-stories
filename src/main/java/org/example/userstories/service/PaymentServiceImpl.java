@@ -7,6 +7,7 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import lombok.RequiredArgsConstructor;
+import org.example.userstories.audit.Auditable;
 import org.example.userstories.dto.SavePayment;
 import org.example.userstories.exception.PaymentNotFoundException;
 import org.example.userstories.mapper.PaymentMapper;
@@ -90,7 +91,14 @@ public class PaymentServiceImpl implements PaymentService {
         return predicates;
     }
 
+    @Override
+    public Payment findById(UUID id) {
+        return paymentRepository.findById(id)
+                .orElseThrow(() -> new PaymentNotFoundException(id));
+    }
+
     @Transactional
+    @Auditable
     @Override
     public SavePayment save(Payment payment, final String idempotencyKey) {
         Optional<Payment> paymentByIdempotencyKey = paymentRepository.findByIdempotencyKey(idempotencyKey);
@@ -102,13 +110,8 @@ public class PaymentServiceImpl implements PaymentService {
         }
     }
 
-    @Override
-    public Payment findById(UUID id) {
-        return paymentRepository.findById(id)
-                .orElseThrow(() -> new PaymentNotFoundException(id));
-    }
-
     @Transactional
+    @Auditable
     @Override
     public Payment updateStatus(UUID id, PaymentStatus status) {
         Payment payment = findById(id);
@@ -117,6 +120,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Transactional
+    @Auditable
     @Override
     public Payment updatePaymentDetails(UUID id, PaymentUpdateRequest details) {
         Payment paymentById = findById(id);
@@ -126,6 +130,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     @Transactional
+    @Auditable
     public void hardDelete(UUID id) {
         findById(id);
         paymentRepository.deleteById(id);
@@ -133,6 +138,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     @Transactional
+    @Auditable
     public void softDelete(UUID id) {
         updateStatus(id, PaymentStatus.CANCELLED);
     }

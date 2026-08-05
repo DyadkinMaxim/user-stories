@@ -121,14 +121,13 @@ public class PaymentController {
         response.setHeader("Content-Disposition", "attachment; filename=payments.csv");
 
         PrintWriter writer = response.getWriter();
-        writer.println("id,amount,currency,accountId,toIban,status,createdAt");
+        writer.println("id,amount,currency,toIban,status,createdAt");
 
         paymentService.findAllForExport().forEach(payment ->
                 writer.println(String.join(",",
                         payment.getId().toString(),
                         payment.getAmount().toString(),
                         payment.getCurrency(),
-                        payment.getAccountId(),
                         payment.getToIban(),
                         payment.getStatus().toString(),
                         payment.getCreatedAt().toString()

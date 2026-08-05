@@ -47,7 +47,7 @@ class PaymentServiceImplTest {
         UUID uuid = UUID.randomUUID();
         Payment payment = new Payment();
         PaymentUpdateRequest paymentUpdateRequest = new PaymentUpdateRequest(
-                200.0, "USD", "ACC-002",
+                200.0, "USD",
                 "DE89370400440532013001");
         when(paymentRepository.findById(uuid)).thenReturn(Optional.of(payment));
         when(paymentRepository.save(payment)).thenReturn(payment);

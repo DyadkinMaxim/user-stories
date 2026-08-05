@@ -60,7 +60,7 @@ class PaymentControllerTest {
     void findAll_returnsOkWithPaymentList() throws Exception {
         Payment payment = new Payment();
         PaymentResponse response = new PaymentResponse(
-                UUID.randomUUID(), 150.0, "EUR", "ACC-001",
+                UUID.randomUUID(), 150.0, "EUR",
                 "DE89370400440532013000", PaymentStatus.PENDING, LocalDateTime.now()
         );
 
@@ -95,7 +95,7 @@ class PaymentControllerTest {
             throws Exception {
         Payment payment = new Payment();
         PaymentResponse response = new PaymentResponse(
-                UUID.randomUUID(), 150.0, "EUR", "ACC-001",
+                UUID.randomUUID(), 150.0, "EUR",
                 "DE89370400440532013000", PaymentStatus.APPROVED, LocalDateTime.now()
         );
 
@@ -135,7 +135,7 @@ class PaymentControllerTest {
                 eq(200.0), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of(payment)));
         when(paymentMapper.toResponse(payment)).thenReturn(
-                new PaymentResponse(UUID.randomUUID(), 150.0, "EUR", "1234",
+                new PaymentResponse(UUID.randomUUID(), 150.0, "EUR",
                         "AB12", PaymentStatus.APPROVED, LocalDateTime.now()));
 
 
@@ -156,7 +156,7 @@ class PaymentControllerTest {
                 isNull(), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of(payment)));
         when(paymentMapper.toResponse(payment)).thenReturn(
-                new PaymentResponse(UUID.randomUUID(), 150.0, "EUR", "1234",
+                new PaymentResponse(UUID.randomUUID(), 150.0, "EUR",
                         "AB12", PaymentStatus.APPROVED, LocalDateTime.now()));
 
         mockMvc.perform(get("/api/v1/payments")
@@ -175,7 +175,7 @@ class PaymentControllerTest {
                 eq(200.0), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of(payment)));
         when(paymentMapper.toResponse(payment)).thenReturn(
-                new PaymentResponse(UUID.randomUUID(), 150.0, "EUR", "1234",
+                new PaymentResponse(UUID.randomUUID(), 150.0, "EUR",
                         "AB12", PaymentStatus.APPROVED, LocalDateTime.now()));
 
         mockMvc.perform(get("/api/v1/payments")
@@ -194,7 +194,7 @@ class PaymentControllerTest {
                 eq(200.0), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of(payment)));
         when(paymentMapper.toResponse(payment)).thenReturn(
-                new PaymentResponse(UUID.randomUUID(), 150.0, "EUR", "1234",
+                new PaymentResponse(UUID.randomUUID(), 150.0, "EUR",
                         "AB12", PaymentStatus.APPROVED, LocalDateTime.now()));
 
         mockMvc.perform(get("/api/v1/payments")
@@ -206,11 +206,11 @@ class PaymentControllerTest {
 
     @Test
     void create_returnsCreatedWithSavedPayment() throws Exception {
-        PaymentRequest request = new PaymentRequest(200.0, "USD", "ACC-002", "FR7630006000011234567890189");
+        PaymentRequest request = new PaymentRequest(200.0, "USD", "FR7630006000011234567890189");
         Payment entity = new Payment();
         Payment saved = new Payment();
         PaymentResponse response = new PaymentResponse(
-                UUID.randomUUID(), 200.0, "USD", "ACC-002",
+                UUID.randomUUID(), 200.0, "USD",
                 "FR7630006000011234567890189", PaymentStatus.PENDING, LocalDateTime.now()
         );
 
@@ -232,7 +232,7 @@ class PaymentControllerTest {
     @Test
     void create_returns400_invalidIban() throws Exception {
         PaymentRequest request = new PaymentRequest(200.0, "USD",
-                "ACC-002", "F1R7630006000011234567890189");
+                "F1R7630006000011234567890189");
 
         mockMvc.perform(post("/api/v1/payments")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -247,11 +247,11 @@ class PaymentControllerTest {
 
     @Test
     void create_returns200_duplicatedIdempotency() throws Exception {
-        PaymentRequest request = new PaymentRequest(200.0, "USD", "ACC-002", "FR7630006000011234567890189");
+        PaymentRequest request = new PaymentRequest(200.0, "USD", "FR7630006000011234567890189");
         Payment entity = new Payment();
         Payment saved = new Payment();
         PaymentResponse response = new PaymentResponse(
-                UUID.randomUUID(), 200.0, "USD", "ACC-002",
+                UUID.randomUUID(), 200.0, "USD",
                 "FR7630006000011234567890189", PaymentStatus.PENDING, LocalDateTime.now()
         );
 
@@ -271,7 +271,7 @@ class PaymentControllerTest {
     void findById_returnsOkWithPayment() throws Exception {
         Payment payment = new Payment();
         UUID id = UUID.randomUUID();
-        PaymentResponse response = new PaymentResponse(id, 150.0, "EUR", "ACC-001",
+        PaymentResponse response = new PaymentResponse(id, 150.0, "EUR",
                 "DE89370400440532013000", PaymentStatus.PENDING, LocalDateTime.now());
 
         when(paymentService.findById(any())).thenReturn(payment);
@@ -281,7 +281,6 @@ class PaymentControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.amount").value(150.0))
                 .andExpect(jsonPath("$.currency").value("EUR"))
-                .andExpect(jsonPath("$.accountId").value("ACC-001"))
                 .andExpect(jsonPath("$.toIban").value("DE89370400440532013000"))
                 .andExpect(jsonPath("$.status").value("PENDING"));
 
@@ -303,7 +302,7 @@ class PaymentControllerTest {
         UUID id = UUID.randomUUID();
         Payment updated = new Payment();
         PaymentResponse response = new PaymentResponse(
-                id, 150.0, "EUR", "ACC-001",
+                id, 150.0, "EUR",
                 "DE89370400440532013000", PaymentStatus.APPROVED, LocalDateTime.now()
         );
 
@@ -333,11 +332,11 @@ class PaymentControllerTest {
         UUID id = UUID.randomUUID();
         Payment updated = new Payment();
         PaymentUpdateRequest request = new PaymentUpdateRequest(
-                200.0, "USD", "ACC-002",
+                200.0, "USD",
                 "DE89370400440532013001"
         );
         PaymentResponse response = new PaymentResponse(
-                id, 200.0, "USD", "ACC-002",
+                id, 200.0, "USD",
                 "DE89370400440532013001", PaymentStatus.APPROVED, LocalDateTime.now()
         );
 
@@ -351,7 +350,6 @@ class PaymentControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.amount").value(200.0))
                 .andExpect(jsonPath("$.currency").value("USD"))
-                .andExpect(jsonPath("$.accountId").value("ACC-002"))
                 .andExpect(jsonPath("$.toIban").value("DE89370400440532013001"))
                 .andExpect(jsonPath("$.status").value("APPROVED"));
     }
@@ -360,7 +358,7 @@ class PaymentControllerTest {
     void updatePaymentDetails_returnsNotFound() throws Exception {
         UUID id = UUID.randomUUID();
         PaymentUpdateRequest request = new PaymentUpdateRequest(
-                200.0, "USD", "ACC-002",
+                200.0, "USD",
                 "DE89370400440532013001"
         );
 
@@ -378,7 +376,7 @@ class PaymentControllerTest {
     void updatePaymentDetails_invalidIban() throws Exception {
         UUID id = UUID.randomUUID();
         PaymentUpdateRequest request = new PaymentUpdateRequest(200.0, "USD",
-                "ACC-002", "F1R7630006000011234567890189");
+                "F1R7630006000011234567890189");
 
         mockMvc.perform(put("/api/v1/payments/{id}", id)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -447,7 +445,6 @@ class PaymentControllerTest {
         payment.setId(UUID.randomUUID());
         payment.setAmount(150.0);
         payment.setCurrency("EUR");
-        payment.setAccountId("ACC-001");
         payment.setToIban("DE89370400440532013000");
         payment.setStatus(PaymentStatus.PENDING);
         payment.setCreatedAt(LocalDateTime.now());
@@ -460,7 +457,7 @@ class PaymentControllerTest {
                         containsString("text/csv")))
                 .andExpect(header().string("Content-Disposition",
                         containsString("attachment; filename=payments.csv")))
-                .andExpect(content().string(containsString("id,amount,currency,accountId,")))
+                .andExpect(content().string(containsString("id,amount,currency,")))
                 .andExpect(content().string(containsString("DE89370400440532013000")));
     }
 }

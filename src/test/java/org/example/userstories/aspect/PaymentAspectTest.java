@@ -52,7 +52,7 @@ public class PaymentAspectTest {
 
         assertDoesNotThrow(() -> paymentService.updatePaymentDetails(
                 UUID.randomUUID(), new PaymentUpdateRequest(
-                        200.0, "USD", "ACC-002",
+                        200.0, "USD",
                         "DE89370400440532013001"
                 )));
     }

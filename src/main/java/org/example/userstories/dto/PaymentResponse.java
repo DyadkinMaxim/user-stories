@@ -10,7 +10,6 @@ public record PaymentResponse(
         UUID id,
         Double amount,
         String currency,
-        String accountId,
         String toIban,
         PaymentStatus status,
         LocalDateTime createdAt
@@ -20,7 +19,6 @@ public record PaymentResponse(
                 payment.getId(),
                 payment.getAmount(),
                 payment.getCurrency(),
-                payment.getAccountId(),
                 payment.getToIban(),
                 payment.getStatus(),
                 payment.getCreatedAt()

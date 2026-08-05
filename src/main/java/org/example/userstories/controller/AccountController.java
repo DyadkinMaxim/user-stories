@@ -22,7 +22,7 @@ public class AccountController {
     private final AccountMapper accountMapper;
 
     @GetMapping
-    public ResponseEntity<List<AccountResponse>> finAll() {
+    public ResponseEntity<List<AccountResponse>> findAll() {
         return ResponseEntity.ok(accountService.findAll().stream()
                 .map(accountMapper::toResponse)
                 .collect(Collectors.toList()));

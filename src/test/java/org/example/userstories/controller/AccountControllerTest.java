@@ -5,7 +5,6 @@ import org.example.userstories.dto.PaymentResponse;
 import org.example.userstories.mapper.AccountMapper;
 import org.example.userstories.mapper.PaymentMapper;
 import org.example.userstories.model.Account;
-import org.example.userstories.model.Payment;
 import org.example.userstories.model.PaymentStatus;
 import org.example.userstories.service.AccountService;
 import org.junit.jupiter.api.Test;
@@ -19,12 +18,10 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 @WebMvcTest(AccountController.class)
 public class AccountControllerTest {

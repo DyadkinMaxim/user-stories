@@ -1,8 +1,5 @@
 package org.example.userstories.dto;
 
-import org.example.userstories.model.Account;
-import org.example.userstories.model.Payment;
-
 import java.util.List;
 import java.util.UUID;
 

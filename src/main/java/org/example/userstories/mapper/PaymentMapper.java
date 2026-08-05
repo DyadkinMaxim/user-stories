@@ -11,6 +11,7 @@ import org.mapstruct.MappingTarget;
 @Mapper(componentModel = "spring")
 public interface PaymentMapper {
 
+    @Mapping(target = "accountId", source = "account.id")
     PaymentResponse toResponse(Payment payment);
 
     @Mapping(target = "id", ignore = true)

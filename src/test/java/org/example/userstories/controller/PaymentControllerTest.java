@@ -61,7 +61,8 @@ class PaymentControllerTest {
         Payment payment = new Payment();
         PaymentResponse response = new PaymentResponse(
                 UUID.randomUUID(), 150.0, "EUR",
-                "DE89370400440532013000", PaymentStatus.PENDING, LocalDateTime.now()
+                "DE89370400440532013000", PaymentStatus.PENDING, LocalDateTime.now(),
+                "1234"
         );
 
         when(paymentService.findAll(isNull(), isNull(),
@@ -96,7 +97,8 @@ class PaymentControllerTest {
         Payment payment = new Payment();
         PaymentResponse response = new PaymentResponse(
                 UUID.randomUUID(), 150.0, "EUR",
-                "DE89370400440532013000", PaymentStatus.APPROVED, LocalDateTime.now()
+                "DE89370400440532013000", PaymentStatus.APPROVED, LocalDateTime.now(),
+                "1234"
         );
 
         when(paymentService.findAll(eq(PaymentStatus.APPROVED), isNull(),
@@ -136,7 +138,7 @@ class PaymentControllerTest {
                 .thenReturn(new PageImpl<>(List.of(payment)));
         when(paymentMapper.toResponse(payment)).thenReturn(
                 new PaymentResponse(UUID.randomUUID(), 150.0, "EUR",
-                        "AB12", PaymentStatus.APPROVED, LocalDateTime.now()));
+                        "AB12", PaymentStatus.APPROVED, LocalDateTime.now(), "1234"));
 
 
         mockMvc.perform(get("/api/v1/payments")
@@ -157,7 +159,7 @@ class PaymentControllerTest {
                 .thenReturn(new PageImpl<>(List.of(payment)));
         when(paymentMapper.toResponse(payment)).thenReturn(
                 new PaymentResponse(UUID.randomUUID(), 150.0, "EUR",
-                        "AB12", PaymentStatus.APPROVED, LocalDateTime.now()));
+                        "AB12", PaymentStatus.APPROVED, LocalDateTime.now(), "1234"));
 
         mockMvc.perform(get("/api/v1/payments")
                         .param("status", "APPROVED")
@@ -176,7 +178,7 @@ class PaymentControllerTest {
                 .thenReturn(new PageImpl<>(List.of(payment)));
         when(paymentMapper.toResponse(payment)).thenReturn(
                 new PaymentResponse(UUID.randomUUID(), 150.0, "EUR",
-                        "AB12", PaymentStatus.APPROVED, LocalDateTime.now()));
+                        "AB12", PaymentStatus.APPROVED, LocalDateTime.now(), "1234"));
 
         mockMvc.perform(get("/api/v1/payments")
                         .param("status", "APPROVED")
@@ -195,7 +197,7 @@ class PaymentControllerTest {
                 .thenReturn(new PageImpl<>(List.of(payment)));
         when(paymentMapper.toResponse(payment)).thenReturn(
                 new PaymentResponse(UUID.randomUUID(), 150.0, "EUR",
-                        "AB12", PaymentStatus.APPROVED, LocalDateTime.now()));
+                        "AB12", PaymentStatus.APPROVED, LocalDateTime.now(), "1234"));
 
         mockMvc.perform(get("/api/v1/payments")
                         .param("minAmount", "100.0")
@@ -211,7 +213,8 @@ class PaymentControllerTest {
         Payment saved = new Payment();
         PaymentResponse response = new PaymentResponse(
                 UUID.randomUUID(), 200.0, "USD",
-                "FR7630006000011234567890189", PaymentStatus.PENDING, LocalDateTime.now()
+                "FR7630006000011234567890189", PaymentStatus.PENDING, LocalDateTime.now(),
+                "1234"
         );
 
         when(paymentMapper.toEntity(request)).thenReturn(entity);
@@ -252,7 +255,8 @@ class PaymentControllerTest {
         Payment saved = new Payment();
         PaymentResponse response = new PaymentResponse(
                 UUID.randomUUID(), 200.0, "USD",
-                "FR7630006000011234567890189", PaymentStatus.PENDING, LocalDateTime.now()
+                "FR7630006000011234567890189", PaymentStatus.PENDING, LocalDateTime.now(),
+                "1234"
         );
 
         when(paymentMapper.toEntity(any())).thenReturn(entity);
@@ -272,7 +276,8 @@ class PaymentControllerTest {
         Payment payment = new Payment();
         UUID id = UUID.randomUUID();
         PaymentResponse response = new PaymentResponse(id, 150.0, "EUR",
-                "DE89370400440532013000", PaymentStatus.PENDING, LocalDateTime.now());
+                "DE89370400440532013000", PaymentStatus.PENDING, LocalDateTime.now(),
+                "1234");
 
         when(paymentService.findById(any())).thenReturn(payment);
         when(paymentMapper.toResponse(payment)).thenReturn(response);
@@ -303,7 +308,8 @@ class PaymentControllerTest {
         Payment updated = new Payment();
         PaymentResponse response = new PaymentResponse(
                 id, 150.0, "EUR",
-                "DE89370400440532013000", PaymentStatus.APPROVED, LocalDateTime.now()
+                "DE89370400440532013000", PaymentStatus.APPROVED, LocalDateTime.now(),
+                "1234"
         );
 
         when(paymentService.updateStatus(any(UUID.class), eq(PaymentStatus.APPROVED) )).thenReturn(updated);
@@ -337,7 +343,8 @@ class PaymentControllerTest {
         );
         PaymentResponse response = new PaymentResponse(
                 id, 200.0, "USD",
-                "DE89370400440532013001", PaymentStatus.APPROVED, LocalDateTime.now()
+                "DE89370400440532013001", PaymentStatus.APPROVED, LocalDateTime.now(),
+                "1234"
         );
 
         when(paymentService.updatePaymentDetails(

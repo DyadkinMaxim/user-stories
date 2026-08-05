@@ -12,16 +12,7 @@ public record PaymentResponse(
         String currency,
         String toIban,
         PaymentStatus status,
-        LocalDateTime createdAt
+        LocalDateTime createdAt,
+        String accountId
 ) {
-    public static PaymentResponse from(Payment payment) {
-        return new PaymentResponse(
-                payment.getId(),
-                payment.getAmount(),
-                payment.getCurrency(),
-                payment.getToIban(),
-                payment.getStatus(),
-                payment.getCreatedAt()
-        );
-    }
 }

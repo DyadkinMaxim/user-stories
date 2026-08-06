@@ -17,10 +17,20 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(PaymentNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ResponseEntity<ProblemDetail> handleNotFound(PaymentNotFoundException ex) {
+    public ResponseEntity<ProblemDetail> handlePaymentNotFound(PaymentNotFoundException ex) {
         ProblemDetail problemDetail =
                 ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
-        problemDetail.setTitle("Entity not found");
+        problemDetail.setTitle("Payment not found");
+        problemDetail.setDetail(ex.getMessage());
+        return ResponseEntity.status(404).body(problemDetail);
+    }
+
+    @ExceptionHandler(AccountNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ResponseEntity<ProblemDetail> handleAccountNotFound(AccountNotFoundException ex) {
+        ProblemDetail problemDetail =
+                ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
+        problemDetail.setTitle("Account not found");
         problemDetail.setDetail(ex.getMessage());
         return ResponseEntity.status(404).body(problemDetail);
     }

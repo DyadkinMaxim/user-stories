@@ -17,6 +17,7 @@ import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.UUID;
 
 @Entity
@@ -58,5 +59,18 @@ public class Payment {
     protected void onCreate() {
         if (status == null) status = PaymentStatus.PENDING;
         if (createdAt == null) createdAt = LocalDateTime.now();
+    }
+
+    @Override
+    public final boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Payment payment)) return false;
+
+        return Objects.equals(id, payment.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id); // be careful - after persistence id is changed!
     }
 }

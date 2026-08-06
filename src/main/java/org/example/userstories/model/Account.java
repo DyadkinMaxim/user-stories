@@ -15,6 +15,7 @@ import org.hibernate.annotations.UuidGenerator;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Entity
@@ -36,4 +37,18 @@ public class Account {
             cascade = CascadeType.ALL,
             fetch = FetchType.LAZY)
     private List<Payment> payments = new ArrayList<>();
+
+
+    @Override
+    public final boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Account account)) return false;
+
+        return Objects.equals(id, account.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id); // be careful - after persistence id is changed!
+    }
 }
